@@ -25,7 +25,7 @@ export const routeGroups = {
     '/model/pumped-storage',
     '/model/thermal-storage',
   ],
-  system: ['/system/users', '/system/roles', '/system/resources'],
+  system: ['/system/users', '/system/roles'],
 } as const;
 
 export const mainMenuItems: MenuItem[] = [
@@ -72,7 +72,6 @@ export const mainMenuItems: MenuItem[] = [
     children: [
       { key: '/system/users', label: '用户管理' },
       { key: '/system/roles', label: '角色管理' },
-      { key: '/system/resources', label: '资源管理' },
     ],
   },
 ];

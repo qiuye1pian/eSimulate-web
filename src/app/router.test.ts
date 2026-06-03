@@ -10,5 +10,7 @@ describe('routeGroups', () => {
     expect(routeGroups.model).toContain('/model/wind-power');
     expect(routeGroups.model).toContain('/model/thermal-storage');
     expect(routeGroups.system).toContain('/system/users');
+    expect(routeGroups.system).toContain('/system/roles');
+    expect(routeGroups.system).not.toContain('/system/resources');
   });
 });
