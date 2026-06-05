@@ -84,6 +84,8 @@ export function ResourceListPage({ definition }: ResourceListPageProps) {
 
   const rows = useMemo(() => listQuery.data?.data?.list ?? [], [listQuery.data]);
   const total = listQuery.data?.data?.total ?? 0;
+  const currentPage = listQuery.data?.data?.page ?? page;
+  const pageSize = listQuery.data?.data?.size ?? 10;
 
   const columns: ColumnsType<ApiRecord> = [
     { title: '名称', dataIndex: 'name', render: (_, record) => getRecordName(record) },
@@ -149,8 +151,8 @@ export function ResourceListPage({ definition }: ResourceListPageProps) {
             onSelect: record => setSelectedRecord(record),
           }}
           pagination={{
-            current: page,
-            pageSize: 10,
+            current: currentPage,
+            pageSize,
             total,
             onChange: setPage,
           }}

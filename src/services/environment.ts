@@ -16,8 +16,30 @@ export interface ResourceListQuery extends PageQuery {
   modelName?: string;
 }
 
-export function getResourceList(endpoint: EnvironmentEndpoint, data: ResourceListQuery) {
-  return post<PageResult<ApiRecord>, ResourceListQuery>(`/${endpoint}/getListByPage`, data);
+interface LegacyResourcePage {
+  page?: number;
+  size?: number;
+  total?: number;
+  content?: ApiRecord[];
+  list?: ApiRecord[];
+  records?: ApiRecord[];
+}
+
+export function normalizeResourcePage(data: LegacyResourcePage): PageResult<ApiRecord> {
+  return {
+    page: data.page,
+    size: data.size,
+    total: data.total ?? 0,
+    list: data.content ?? data.list ?? data.records ?? [],
+  };
+}
+
+export async function getResourceList(endpoint: EnvironmentEndpoint, data: ResourceListQuery) {
+  const response = await post<LegacyResourcePage, ResourceListQuery>(`/${endpoint}/getListByPage`, data);
+  return {
+    ...response,
+    data: normalizeResourcePage(response.data),
+  };
 }
 
 export function deleteResource(endpoint: EnvironmentEndpoint, id: number | string) {
