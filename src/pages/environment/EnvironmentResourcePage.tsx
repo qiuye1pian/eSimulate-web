@@ -1,23 +1,21 @@
 import { useParams } from 'react-router-dom';
-
-const titles: Record<string, string> = {
-  'electric-load': '电负荷',
-  'thermal-load': '热负荷',
-  'grid-pricing': '电网电价',
-  wind: '风力数据',
-  'water-flow': '水流数据',
-  sunlight: '光照数据',
-  temperature: '温度数据',
-};
+import { Result } from 'antd';
+import { ResourceListPage } from '@/features/environment/ResourceListPage';
+import { getEnvironmentResourceDefinition } from '@/features/environment/resource-definitions';
 
 export function EnvironmentResourcePage() {
   const { resourceType = '' } = useParams();
-  const title = titles[resourceType] ?? '环境数据';
+  const definition = getEnvironmentResourceDefinition(resourceType);
+
+  if (!definition) {
+    return <Result status="404" title="环境资源不存在" subTitle="请从左侧菜单选择一个有效的环境或负荷资源。" />;
+  }
 
   return (
     <section className="page-shell">
-      <h1 className="page-shell__title">{title}</h1>
-      <p className="page-shell__description">复刻旧版列表、搜索、上传、下载、删除和曲线预览能力。</p>
+      <h1 className="page-shell__title">{definition.title}</h1>
+      <p className="page-shell__description">列表、搜索、上传、下载、删除和曲线预览使用同一套资源模板。</p>
+      <ResourceListPage definition={definition} />
     </section>
   );
 }
