@@ -22,18 +22,25 @@ request.interceptors.request.use((config) => {
   return config;
 });
 
+export function assertApiSuccess<T>(response: ApiResponse<T>) {
+  if (response.code !== 200) {
+    throw new Error(response.message || response.msg || '接口请求失败');
+  }
+  return response;
+}
+
 export async function post<TResponse, TRequest = unknown>(
   url: string,
   data?: TRequest,
   config?: AxiosRequestConfig,
 ) {
   const response = await request.post<ApiResponse<TResponse>>(url, data, config);
-  return response.data;
+  return assertApiSuccess(response.data);
 }
 
 export async function get<TResponse>(url: string, config?: AxiosRequestConfig) {
   const response = await request.get<ApiResponse<TResponse>>(url, config);
-  return response.data;
+  return assertApiSuccess(response.data);
 }
 
 export async function downloadBlob(url: string, data?: unknown, config?: AxiosRequestConfig) {

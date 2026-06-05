@@ -64,6 +64,9 @@ export function ResourceListPage({ definition }: ResourceListPageProps) {
       setUploadOpen(false);
       listQuery.refetch();
     },
+    onError: (error) => {
+      message.error(error instanceof Error ? error.message : '上传失败');
+    },
   });
 
   const deleteMutation = useMutation({
@@ -73,12 +76,18 @@ export function ResourceListPage({ definition }: ResourceListPageProps) {
       setSelectedRecord(null);
       listQuery.refetch();
     },
+    onError: (error) => {
+      message.error(error instanceof Error ? error.message : '删除失败');
+    },
   });
 
   const downloadMutation = useMutation({
     mutationFn: (record: ApiRecord) => downloadResource(definition.endpoint, getRecordId(record) as number | string),
     onSuccess: (blob, record) => {
       saveBlob(blob, `${getRecordName(record)}.csv`);
+    },
+    onError: (error) => {
+      message.error(error instanceof Error ? error.message : '下载失败');
     },
   });
 
