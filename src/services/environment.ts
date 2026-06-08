@@ -52,8 +52,8 @@ export function uploadResourceScheme(endpoint: EnvironmentEndpoint, data: FormDa
   });
 }
 
-export function addGridPricing(data: ApiRecord) {
-  return post<ApiRecord, ApiRecord>('/model/grid/add', data);
+export function addGridPricing<TRequest extends object>(data: TRequest) {
+  return post<ApiRecord, TRequest>('/model/grid/add', data);
 }
 
 export function downloadResource(endpoint: EnvironmentEndpoint, id: number | string) {

@@ -83,3 +83,25 @@ body {
   gap: 16px;
   margin-bottom: 16px;
 }
+
+.grid-pricing-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.8fr) minmax(360px, 1.2fr);
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.grid-pricing-list {
+  min-height: 360px;
+  margin-top: 16px;
+}
+
+.grid-pricing-list__selected {
+  background: #ecfdf5;
+}
+
+@media (max-width: 960px) {
+  .grid-pricing-layout {
+    grid-template-columns: 1fr;
+  }
+}

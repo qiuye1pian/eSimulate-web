@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { Result } from 'antd';
+import { GridPricingPage } from '@/features/environment/GridPricingPage';
 import { ResourceListPage } from '@/features/environment/ResourceListPage';
 import { getEnvironmentResourceDefinition } from '@/features/environment/resource-definitions';
 
@@ -14,8 +15,12 @@ export function EnvironmentResourcePage() {
   return (
     <section className="page-shell">
       <h1 className="page-shell__title">{definition.title}</h1>
-      <p className="page-shell__description">列表、搜索、上传、下载、删除和曲线预览使用同一套资源模板。</p>
-      <ResourceListPage definition={definition} />
+      <p className="page-shell__description">
+        {definition.key === 'grid-pricing'
+          ? '电网电价沿用旧版的模型列表和参数表单流程。'
+          : '列表、搜索、上传、下载、删除和曲线预览使用同一套资源模板。'}
+      </p>
+      {definition.key === 'grid-pricing' ? <GridPricingPage /> : <ResourceListPage definition={definition} />}
     </section>
   );
 }
