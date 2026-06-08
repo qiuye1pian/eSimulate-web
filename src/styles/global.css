@@ -105,3 +105,39 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+.model-editor-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.7fr) minmax(320px, 0.8fr) minmax(420px, 1.2fr);
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.model-editor-list {
+  min-height: 420px;
+  margin-top: 16px;
+}
+
+.model-editor-list__selected {
+  background: #ecfdf5;
+}
+
+@media (max-width: 1200px) {
+  .model-editor-layout {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .model-editor-layout > :last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 800px) {
+  .model-editor-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .model-editor-layout > :last-child {
+    grid-column: auto;
+  }
+}

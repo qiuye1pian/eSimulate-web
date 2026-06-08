@@ -1,4 +1,6 @@
 import { useParams } from 'react-router-dom';
+import { ModelEditorPage } from '@/features/model-config/ModelEditorPage';
+import { windPowerDefinition } from '@/features/model-config/wind-power';
 
 const titles: Record<string, string> = {
   'wind-power': '风电',
@@ -20,7 +22,8 @@ export function ModelConfigPage() {
   return (
     <section className="page-shell">
       <h1 className="page-shell__title">{title}</h1>
-      <p className="page-shell__description">复刻旧版模型列表、参数表单、新增、删除、保存和图形预览能力。</p>
+      <p className="page-shell__description">模型列表、参数表单、新增、删除、保存和图形预览使用公共模型模板。</p>
+      {modelType === 'wind-power' ? <ModelEditorPage definition={windPowerDefinition} /> : null}
     </section>
   );
 }
