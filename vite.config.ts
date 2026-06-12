@@ -4,7 +4,7 @@ import { defineConfig, loadEnv } from 'vite';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  const apiBaseUrl = env.VITE_API_BASE_URL || 'http://localhost:8000';
+  const apiProxyTarget = env.VITE_API_PROXY_TARGET || 'http://localhost:8080';
   const apiPrefix = env.VITE_API_PREFIX || '/api';
 
   return {
@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => {
       port: 5173,
       proxy: {
         [apiPrefix]: {
-          target: apiBaseUrl,
+          target: apiProxyTarget,
           changeOrigin: true,
         },
       },
