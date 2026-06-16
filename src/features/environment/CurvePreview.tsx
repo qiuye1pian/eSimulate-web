@@ -8,8 +8,40 @@ interface CurvePreviewProps {
   unit?: string;
 }
 
-function normalizeArray(value: unknown): unknown[] {
-  return Array.isArray(value) ? value : [];
+function normalizeObject(value: unknown): ApiRecord {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value as ApiRecord : {};
+}
+
+export function buildCurveOption(data: ApiRecord, unit?: string) {
+  const xAxis = normalizeObject(data.XAxis);
+  const yAxis = normalizeObject(data.YAxis);
+  const series = Array.isArray(data.series) ? data.series : [];
+
+  return {
+    color: ['#0f766e', '#2563eb', '#d97706'],
+    tooltip: { trigger: 'axis' },
+    grid: { left: 56, right: 24, top: 28, bottom: 68 },
+    xAxis: {
+      type: 'category',
+      boundaryGap: false,
+      axisLine: { lineStyle: { color: '#cbd5e1' } },
+      axisLabel: { color: '#64748b' },
+      ...xAxis,
+    },
+    yAxis: {
+      type: 'value',
+      name: unit,
+      nameTextStyle: { color: '#475569', padding: [0, 0, 4, 0] },
+      splitLine: { lineStyle: { color: '#e8edf3' } },
+      axisLabel: { color: '#64748b' },
+      ...yAxis,
+    },
+    dataZoom: [
+      { type: 'slider', start: 0, end: 100 },
+      { type: 'inside', start: 0, end: 100 },
+    ],
+    series,
+  };
 }
 
 export function CurvePreview({ data, loading = false, unit }: CurvePreviewProps) {
@@ -29,21 +61,7 @@ export function CurvePreview({ data, loading = false, unit }: CurvePreviewProps)
       }
 
       const chart = echarts.init(chartRef.current);
-      const xAxis = normalizeArray(data.XAxis);
-      const series = normalizeArray(data.series);
-      const yAxis = data.YAxis && typeof data.YAxis === 'object' ? data.YAxis : {};
-
-      chart.setOption({
-        tooltip: { trigger: 'axis' },
-        grid: { left: 48, right: 24, top: 32, bottom: 64 },
-        xAxis: { type: 'category', boundaryGap: false, data: xAxis },
-        yAxis: { type: 'value', name: unit, ...yAxis },
-        dataZoom: [
-          { type: 'slider', start: 0, end: 100 },
-          { type: 'inside', start: 0, end: 100 },
-        ],
-        series,
-      });
+      chart.setOption(buildCurveOption(data, unit));
 
       const resize = () => chart.resize();
       window.addEventListener('resize', resize);
@@ -66,7 +84,7 @@ export function CurvePreview({ data, loading = false, unit }: CurvePreviewProps)
 
   return (
     <Spin spinning={loading}>
-      <div ref={chartRef} style={{ height: 360, width: '100%' }} />
+      <div className="curve-preview" ref={chartRef} />
     </Spin>
   );
 }

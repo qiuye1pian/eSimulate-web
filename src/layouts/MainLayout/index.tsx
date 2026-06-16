@@ -10,7 +10,7 @@ export function MainLayout() {
 
   return (
     <Layout className="main-layout">
-      <Sider width={256} className="main-layout__sider">
+      <Sider width={256} breakpoint="lg" collapsedWidth={0} className="main-layout__sider">
         <div className="main-layout__brand">eSimulate</div>
         <Menu
           mode="inline"
