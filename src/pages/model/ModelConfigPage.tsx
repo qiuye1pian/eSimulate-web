@@ -1,5 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { ModelEditorPage } from '@/features/model-config/ModelEditorPage';
+import { hydropowerDefinition } from '@/features/model-config/hydropower';
+import { solarPowerDefinition } from '@/features/model-config/solar-power';
 import { windPowerDefinition } from '@/features/model-config/wind-power';
 
 const titles: Record<string, string> = {
@@ -24,6 +26,8 @@ export function ModelConfigPage() {
       <h1 className="page-shell__title">{title}</h1>
       <p className="page-shell__description">模型列表、参数表单、新增、删除、保存和图形预览使用公共模型模板。</p>
       {modelType === 'wind-power' ? <ModelEditorPage definition={windPowerDefinition} /> : null}
+      {modelType === 'photovoltaic' ? <ModelEditorPage definition={solarPowerDefinition} /> : null}
+      {modelType === 'hydropower' ? <ModelEditorPage definition={hydropowerDefinition} /> : null}
     </section>
   );
 }

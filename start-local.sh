@@ -14,5 +14,9 @@ if [ ! -d "node_modules" ]; then
   npm install
 fi
 
+API_PROXY_TARGET="${1:-${VITE_API_PROXY_TARGET:-http://39.97.247.145:8080}}"
+export VITE_API_PROXY_TARGET="$API_PROXY_TARGET"
+
 echo "Starting eSimulate web at http://localhost:5173"
+echo "Proxying /api requests to $VITE_API_PROXY_TARGET"
 npm run dev -- --host 0.0.0.0

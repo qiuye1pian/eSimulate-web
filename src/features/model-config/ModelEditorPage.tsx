@@ -5,6 +5,7 @@ import { App, Button, Form, Input, InputNumber, List, Pagination, Space, Tag } f
 import { addModel, deleteModel, getModelList, showModelGraph } from '@/services/model-config';
 import type { ApiRecord } from '@/types/api';
 import { CurvePreview } from '@/features/environment/CurvePreview';
+import { FormulaPanel } from './FormulaPanel';
 import type { ModelDefinition } from './types';
 
 interface ModelEditorPageProps<TValues extends object> {
@@ -24,9 +25,11 @@ export function ModelEditorPage<TValues extends object>({ definition }: ModelEdi
   const [searchText, setSearchText] = useState('');
   const [keyword, setKeyword] = useState('');
   const [selectedRecord, setSelectedRecord] = useState<ApiRecord | null>(null);
-  const [graphData, setGraphData] = useState<ApiRecord>();
+  const [graphData, setGraphData] = useState<unknown>();
   const [isDirty, setIsDirty] = useState(false);
+  const [activeFormulaField, setActiveFormulaField] = useState<keyof TValues & string>();
   const graphTimer = useRef<number>();
+  const deriveTimer = useRef<number>();
 
   const initialValues = Object.fromEntries(
     definition.fields.filter(field => field.defaultValue !== undefined).map(field => [field.key, field.defaultValue]),
@@ -47,12 +50,16 @@ export function ModelEditorPage<TValues extends object>({ definition }: ModelEdi
     if (graphTimer.current) {
       window.clearTimeout(graphTimer.current);
     }
+    if (deriveTimer.current) {
+      window.clearTimeout(deriveTimer.current);
+    }
   }, []);
 
   const resetEditor = () => {
     setSelectedRecord(null);
     setGraphData(undefined);
     setIsDirty(false);
+    setActiveFormulaField(undefined);
     form.resetFields();
   };
 
@@ -116,6 +123,8 @@ export function ModelEditorPage<TValues extends object>({ definition }: ModelEdi
   const pageSize = listQuery.data?.data.size ?? 10;
   const technicalFields = definition.fields.filter(field => !sharedFieldOrder.includes(field.key));
   const sharedFields = sharedFieldOrder.flatMap(key => definition.fields.filter(field => field.key === key));
+  const hasVisualPanel = definition.buildGraphPayload || definition.formula;
+  const compactFormulaPanel = definition.formula && !definition.buildGraphPayload;
 
   return (
     <div className="model-workspace">
@@ -188,42 +197,50 @@ export function ModelEditorPage<TValues extends object>({ definition }: ModelEdi
           }}
         />
         <div className="model-catalog-footer">
-          <Pagination
-            simple
-            current={currentPage}
-            pageSize={pageSize}
-            total={total}
-            onChange={setPage}
-          />
+          {total > 0 ? (
+            <Pagination
+              simple
+              current={currentPage}
+              pageSize={pageSize}
+              total={total}
+              onChange={setPage}
+            />
+          ) : <span />}
           <span>共 {total} 条记录</span>
         </div>
       </aside>
 
-      <main className="model-workspace__main">
-        {definition.buildGraphPayload ? (
-          <section className="model-workspace__chart">
-            <div className="model-panel-heading model-panel-heading--inline">
-              <div>
-                <span className="model-panel-heading__eyebrow">OUTPUT CURVE</span>
-                <h2>{selectedRecord ? String(selectedRecord.modelName) : `${definition.title}模型出力`}</h2>
-              </div>
-              <Button
-                icon={<ReloadOutlined />}
-                loading={graphMutation.isPending}
-                onClick={async () => {
-                  const values = await form.validateFields();
-                  const validationMessage = definition.validate?.(values as TValues);
-                  if (validationMessage) {
-                    message.warning(validationMessage);
-                    return;
-                  }
-                  graphMutation.mutate(values as TValues);
-                }}
-              >
-                刷新曲线
-              </Button>
-            </div>
-            <CurvePreview data={graphData} loading={graphMutation.isPending} unit={definition.graphUnit} />
+      <main className={`model-workspace__main${compactFormulaPanel ? ' model-workspace__main--formula' : ''}`}>
+        {hasVisualPanel ? (
+          <section className={`model-workspace__visual${definition.buildGraphPayload ? ' model-workspace__chart' : ' model-workspace__formula'}`}>
+            {definition.buildGraphPayload ? (
+              <>
+                <div className="model-panel-heading model-panel-heading--inline">
+                  <div>
+                    <span className="model-panel-heading__eyebrow">OUTPUT CURVE</span>
+                    <h2>{selectedRecord ? String(selectedRecord.modelName) : `${definition.title}模型出力`}</h2>
+                  </div>
+                  <Button
+                    icon={<ReloadOutlined />}
+                    loading={graphMutation.isPending}
+                    onClick={async () => {
+                      const values = await form.validateFields();
+                      const validationMessage = definition.validate?.(values as TValues);
+                      if (validationMessage) {
+                        message.warning(validationMessage);
+                        return;
+                      }
+                      graphMutation.mutate(values as TValues);
+                    }}
+                  >
+                    刷新曲线
+                  </Button>
+                </div>
+                <CurvePreview data={graphData} loading={graphMutation.isPending} type={definition.graphType} unit={definition.graphUnit} />
+              </>
+            ) : definition.formula ? (
+              <FormulaPanel formula={definition.formula} activeField={activeFormulaField} />
+            ) : null}
           </section>
         ) : null}
 
@@ -235,6 +252,16 @@ export function ModelEditorPage<TValues extends object>({ definition }: ModelEdi
             onFinish={values => handleFinish(values as TValues)}
             onValuesChange={(_, allValues) => {
               setIsDirty(true);
+              if (definition.deriveValues) {
+                if (deriveTimer.current) {
+                  window.clearTimeout(deriveTimer.current);
+                }
+                deriveTimer.current = window.setTimeout(() => {
+                  definition.deriveValues?.(allValues as TValues)
+                    .then(values => form.setFieldsValue(values as TValues & { modelName: string }))
+                    .catch(error => message.error(error instanceof Error ? error.message : '计算派生参数失败'));
+                }, 600);
+              }
               if (!definition.buildGraphPayload || !definition.graphFields) {
                 return;
               }
@@ -300,9 +327,16 @@ export function ModelEditorPage<TValues extends object>({ definition }: ModelEdi
                       key={field.key}
                       name={field.key as never}
                       label={field.label}
-                      rules={[{ required: true, message: `请输入${field.label}` }]}
+                      rules={[{ required: !field.readOnly, message: `请输入${field.label}` }]}
                     >
-                      <InputNumber min={field.min} max={field.max} suffix={field.unit} style={{ width: '100%' }} />
+                      <InputNumber
+                        disabled={field.readOnly}
+                        min={field.min}
+                        max={field.max}
+                        suffix={field.unit}
+                        style={{ width: '100%' }}
+                        onFocus={() => setActiveFormulaField(field.key)}
+                      />
                     </Form.Item>
                   ))}
                 </div>
@@ -321,9 +355,16 @@ export function ModelEditorPage<TValues extends object>({ definition }: ModelEdi
                       key={field.key}
                       name={field.key as never}
                       label={field.label}
-                      rules={[{ required: true, message: `请输入${field.label}` }]}
+                      rules={[{ required: !field.readOnly, message: `请输入${field.label}` }]}
                     >
-                      <InputNumber min={field.min} max={field.max} suffix={field.unit} style={{ width: '100%' }} />
+                      <InputNumber
+                        disabled={field.readOnly}
+                        min={field.min}
+                        max={field.max}
+                        suffix={field.unit}
+                        style={{ width: '100%' }}
+                        onFocus={() => setActiveFormulaField(field.key)}
+                      />
                     </Form.Item>
                   ))}
                 </div>

@@ -56,9 +56,9 @@ export function showModelGraph<TRequest extends object>(endpoint: ModelEndpoint,
 }
 
 export function calculateHydroEta(data: ApiRecord) {
-  return post<ApiRecord, ApiRecord>('/model/hydro_power_plant/calculate_eta', data);
+  return post<number, ApiRecord>('/model/hydro_power_plant/calculate_eta', data);
 }
 
 export function calculateHydroHead(data: ApiRecord) {
-  return post<ApiRecord, ApiRecord>('/model/hydro_power_plant/calculate_head', data);
+  return post<number, ApiRecord>('/model/hydro_power_plant/calculate_head', data);
 }

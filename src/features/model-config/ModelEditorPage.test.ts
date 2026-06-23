@@ -32,4 +32,28 @@ describe('ModelEditorPage workspace structure', () => {
     expect(source).toContain('setIsDirty(true)');
     expect(source).not.toContain('form.isFieldsTouched()');
   });
+
+  it('hides pagination controls when the model catalog is empty', () => {
+    expect(source).toContain('{total > 0 ? (');
+    expect(source).toContain('<span>共 {total} 条记录</span>');
+  });
+
+  it('supports readonly fields and debounced derived values', () => {
+    expect(source).toContain('disabled={field.readOnly}');
+    expect(source).toContain('definition.deriveValues');
+    expect(source).toContain('deriveTimer');
+  });
+
+  it('places formula definitions in the top visual panel instead of inside parameters', () => {
+    expect(source).toContain('model-workspace__visual');
+    expect(source).toContain('model-workspace__main--formula');
+    expect(source).toContain('definition.formula ? (');
+    expect(source).toContain('<FormulaPanel formula={definition.formula} activeField={activeFormulaField} />');
+
+    const formulaIndex = source.indexOf('<FormulaPanel formula={definition.formula} activeField={activeFormulaField} />');
+    const parameterIndex = source.indexOf('<section className="model-workspace__parameters">');
+    expect(formulaIndex).toBeGreaterThan(-1);
+    expect(parameterIndex).toBeGreaterThan(-1);
+    expect(formulaIndex).toBeLessThan(parameterIndex);
+  });
 });

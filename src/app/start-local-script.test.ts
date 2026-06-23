@@ -13,6 +13,8 @@ describe('start-local.sh', () => {
     expect(content).toContain('set -euo pipefail');
     expect(content).toContain('cd "$SCRIPT_DIR"');
     expect(content).toContain('npm install');
+    expect(content).toContain('API_PROXY_TARGET="${1:-${VITE_API_PROXY_TARGET:-http://39.97.247.145:8080}}"');
+    expect(content).toContain('export VITE_API_PROXY_TARGET="$API_PROXY_TARGET"');
     expect(content).toContain('npm run dev -- --host 0.0.0.0');
   });
 });
