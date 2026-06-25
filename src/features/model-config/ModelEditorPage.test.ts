@@ -42,6 +42,12 @@ describe('ModelEditorPage workspace structure', () => {
     expect(source).toContain('disabled={field.readOnly}');
     expect(source).toContain('definition.deriveValues');
     expect(source).toContain('deriveTimer');
+    expect(source).toContain('step={field.step}');
+    expect(source).toContain('placeholder={field.placeholder}');
+    expect(source).toContain('handleFormFocus');
+    expect(source).toContain('model-parameter-form-body');
+    expect(source).toContain('<div className="model-parameter-form-body" onFocusCapture={handleFormFocus}>');
+    expect(source).toContain('onClick={() => setActiveFormulaField(field.key)}');
   });
 
   it('places formula definitions in the top visual panel instead of inside parameters', () => {

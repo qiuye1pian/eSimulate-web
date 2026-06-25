@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { type FocusEvent, useEffect, useRef, useState } from 'react';
 import { DeleteOutlined, PlusOutlined, ReloadOutlined, SaveOutlined, SearchOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { App, Button, Form, Input, InputNumber, List, Pagination, Space, Tag } from 'antd';
@@ -54,6 +54,14 @@ export function ModelEditorPage<TValues extends object>({ definition }: ModelEdi
       window.clearTimeout(deriveTimer.current);
     }
   }, []);
+
+  const handleFormFocus = (event: FocusEvent<HTMLDivElement>) => {
+    const target = event.target;
+    const field = definition.fields.find(item => item.key === target.id);
+    if (field) {
+      setActiveFormulaField(field.key);
+    }
+  };
 
   const resetEditor = () => {
     setSelectedRecord(null);
@@ -276,6 +284,7 @@ export function ModelEditorPage<TValues extends object>({ definition }: ModelEdi
               graphTimer.current = window.setTimeout(() => graphMutation.mutate(values), 3000);
             }}
           >
+            <div className="model-parameter-form-body" onFocusCapture={handleFormFocus}>
             <div className="model-panel-heading model-panel-heading--inline">
               <div>
                 <span className="model-panel-heading__eyebrow">PARAMETERS</span>
@@ -333,9 +342,12 @@ export function ModelEditorPage<TValues extends object>({ definition }: ModelEdi
                         disabled={field.readOnly}
                         min={field.min}
                         max={field.max}
+                        step={field.step}
+                        placeholder={field.placeholder}
                         suffix={field.unit}
                         style={{ width: '100%' }}
                         onFocus={() => setActiveFormulaField(field.key)}
+                        onClick={() => setActiveFormulaField(field.key)}
                       />
                     </Form.Item>
                   ))}
@@ -361,15 +373,19 @@ export function ModelEditorPage<TValues extends object>({ definition }: ModelEdi
                         disabled={field.readOnly}
                         min={field.min}
                         max={field.max}
+                        step={field.step}
+                        placeholder={field.placeholder}
                         suffix={field.unit}
                         style={{ width: '100%' }}
                         onFocus={() => setActiveFormulaField(field.key)}
+                        onClick={() => setActiveFormulaField(field.key)}
                       />
                     </Form.Item>
                   ))}
                 </div>
               </div>
             ) : null}
+            </div>
           </Form>
         </section>
       </main>

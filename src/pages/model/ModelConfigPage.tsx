@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { ModelEditorPage } from '@/features/model-config/ModelEditorPage';
+import { batteryDefinition } from '@/features/model-config/battery';
 import { hydropowerDefinition } from '@/features/model-config/hydropower';
 import { solarPowerDefinition } from '@/features/model-config/solar-power';
 import { windPowerDefinition } from '@/features/model-config/wind-power';
@@ -28,6 +29,7 @@ export function ModelConfigPage() {
       {modelType === 'wind-power' ? <ModelEditorPage definition={windPowerDefinition} /> : null}
       {modelType === 'photovoltaic' ? <ModelEditorPage definition={solarPowerDefinition} /> : null}
       {modelType === 'hydropower' ? <ModelEditorPage definition={hydropowerDefinition} /> : null}
+      {modelType === 'battery' ? <ModelEditorPage definition={batteryDefinition} /> : null}
     </section>
   );
 }

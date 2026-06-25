@@ -6,8 +6,10 @@ export interface ModelFieldDefinition<TValues extends object> {
   recordKey: string;
   label: string;
   unit?: string;
+  placeholder?: string;
   min?: number;
   max?: number;
+  step?: number;
   defaultValue?: number;
   readOnly?: boolean;
 }
