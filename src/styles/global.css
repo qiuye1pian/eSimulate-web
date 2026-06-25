@@ -332,6 +332,21 @@ body {
   font-size: 11px;
 }
 
+.model-slider-number {
+  display: grid;
+  grid-template-columns: minmax(90px, 1fr) 84px;
+  align-items: center;
+  column-gap: 10px;
+}
+
+.model-slider-number .ant-slider {
+  margin: 10px 6px;
+}
+
+.model-slider-number__input {
+  min-width: 0;
+}
+
 .model-parameter-section {
   padding: 16px 0 2px;
   border-bottom: 1px solid #edf1f5;

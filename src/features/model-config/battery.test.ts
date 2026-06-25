@@ -62,14 +62,19 @@ describe('battery model definition', () => {
     const fields = Object.fromEntries(batteryDefinition.fields.map(field => [field.key, field]));
 
     expect(fields.socMin.step).toBe(0.001);
+    expect(fields.socMin.control).toBe('slider-number');
     expect(fields.socMin.placeholder).toBe('0.001');
     expect(fields.socMax.step).toBe(0.001);
+    expect(fields.socMax.control).toBe('slider-number');
     expect(fields.socMax.placeholder).toBe('0.999');
     expect(fields.selfDischargeRate.step).toBe(0.00001);
+    expect(fields.selfDischargeRate.control).toBe('slider-number');
     expect(fields.selfDischargeRate.placeholder).toBe('0.00001');
     expect(fields.chargeEfficiency.step).toBe(0.001);
+    expect(fields.chargeEfficiency.control).toBe('slider-number');
     expect(fields.chargeEfficiency.placeholder).toBe('0.950');
     expect(fields.dischargeEfficiency.step).toBe(0.001);
+    expect(fields.dischargeEfficiency.control).toBe('slider-number');
     expect(fields.dischargeEfficiency.placeholder).toBe('0.950');
   });
 

@@ -57,4 +57,15 @@ describe('solar power model definition', () => {
     expect(validateSolarPowerParameters({ ...values, temperatureCoefficient: 0.1 })).toBe('环境温度系数必须小于或等于 0');
     expect(validateSolarPowerParameters({ ...values, referenceIrradiance: 0 })).toBe('标准辐照强度必须大于 0');
   });
+
+  it('uses short placeholders for editable numeric inputs', () => {
+    const fields = Object.fromEntries(solarPowerDefinition.fields.map(field => [field.key, field]));
+
+    expect(fields.ratedPower.placeholder).toBe('100');
+    expect(fields.referenceTemperature.placeholder).toBe('25');
+    expect(fields.temperatureCoefficient.placeholder).toBe('-0.0045');
+    expect(fields.referenceIrradiance.placeholder).toBe('1000');
+    expect(fields.cost.placeholder).toBe('0.020');
+    expect(fields.purchaseCost.placeholder).toBe('120000');
+  });
 });

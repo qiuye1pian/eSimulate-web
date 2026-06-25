@@ -3,6 +3,7 @@ import { ModelEditorPage } from '@/features/model-config/ModelEditorPage';
 import { batteryDefinition } from '@/features/model-config/battery';
 import { hydropowerDefinition } from '@/features/model-config/hydropower';
 import { solarPowerDefinition } from '@/features/model-config/solar-power';
+import { solarThermalDefinition } from '@/features/model-config/solar-thermal';
 import { windPowerDefinition } from '@/features/model-config/wind-power';
 
 const titles: Record<string, string> = {
@@ -30,6 +31,7 @@ export function ModelConfigPage() {
       {modelType === 'photovoltaic' ? <ModelEditorPage definition={solarPowerDefinition} /> : null}
       {modelType === 'hydropower' ? <ModelEditorPage definition={hydropowerDefinition} /> : null}
       {modelType === 'battery' ? <ModelEditorPage definition={batteryDefinition} /> : null}
+      {modelType === 'solar-thermal' ? <ModelEditorPage definition={solarThermalDefinition} /> : null}
     </section>
   );
 }

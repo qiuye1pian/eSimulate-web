@@ -87,4 +87,47 @@ describe('hydropower model definition', () => {
     expect(validateHydropowerParameters({ ...values, turbineEfficiency: 1.1 })).toBe('效率参数必须在 0 到 1 之间');
     expect(validateHydropowerParameters({ ...values, gravity: 0 })).toBe('重力加速度和 ρg 必须大于 0');
   });
+
+  it('uses short placeholders for editable numeric inputs', () => {
+    const fields = Object.fromEntries(hydropowerDefinition.fields.map(field => [field.key, field]));
+
+    expect(fields.turbineEfficiency.step).toBe(0.01);
+    expect(fields.generatorEfficiency.step).toBe(0.01);
+    expect(fields.transmissionEfficiency.step).toBe(0.01);
+    expect(fields.turbineEfficiency.placeholder).toBe('0.90');
+    expect(fields.generatorEfficiency.placeholder).toBe('0.95');
+    expect(fields.transmissionEfficiency.placeholder).toBe('0.98');
+    expect(fields.turbineEfficiency.control).toBe('slider-number');
+    expect(fields.generatorEfficiency.control).toBe('slider-number');
+    expect(fields.transmissionEfficiency.control).toBe('slider-number');
+    expect(fields.upstreamElevation.placeholder).toBe('100');
+    expect(fields.downstreamElevation.placeholder).toBe('90');
+    expect(fields.upstreamVelocity.placeholder).toBe('2');
+    expect(fields.downstreamVelocity.placeholder).toBe('1');
+    expect(fields.upstreamDensity.columnStart).toBe(1);
+    expect(fields.upstreamVelocity.columnStart).toBe(1);
+    expect(fields.cost.placeholder).toBe('0.030');
+    expect(fields.purchaseCost.placeholder).toBe('200000');
+  });
+
+  it('orders head-related fields by formula groups', () => {
+    expect(hydropowerDefinition.fields.map(field => field.key)).toEqual([
+      'totalEfficiency',
+      'turbineEfficiency',
+      'generatorEfficiency',
+      'transmissionEfficiency',
+      'head',
+      'upstreamElevation',
+      'downstreamElevation',
+      'upstreamDensity',
+      'downstreamDensity',
+      'specificWeight',
+      'gravity',
+      'upstreamVelocity',
+      'downstreamVelocity',
+      'carbonEmissionFactor',
+      'cost',
+      'purchaseCost',
+    ]);
+  });
 });

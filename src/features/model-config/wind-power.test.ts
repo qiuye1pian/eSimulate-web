@@ -51,4 +51,15 @@ describe('wind power model definition', () => {
     expect(validateWindSpeedOrder({ ...values, cutInSpeed: 13 })).toBe('切入风速必须小于或等于额定风速');
     expect(validateWindSpeedOrder({ ...values, cutOutSpeed: 11 })).toBe('切出风速必须大于或等于额定风速');
   });
+
+  it('uses short placeholders for editable numeric inputs', () => {
+    const fields = Object.fromEntries(windPowerDefinition.fields.map(field => [field.key, field]));
+
+    expect(fields.ratedPower.placeholder).toBe('1000');
+    expect(fields.cutInSpeed.placeholder).toBe('3');
+    expect(fields.ratedSpeed.placeholder).toBe('12');
+    expect(fields.cutOutSpeed.placeholder).toBe('25');
+    expect(fields.cost.placeholder).toBe('0.100');
+    expect(fields.purchaseCost.placeholder).toBe('5000000');
+  });
 });

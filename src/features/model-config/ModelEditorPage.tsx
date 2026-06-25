@@ -1,12 +1,12 @@
 import { type FocusEvent, useEffect, useRef, useState } from 'react';
 import { DeleteOutlined, PlusOutlined, ReloadOutlined, SaveOutlined, SearchOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { App, Button, Form, Input, InputNumber, List, Pagination, Space, Tag } from 'antd';
+import { App, Button, Form, Input, InputNumber, List, Pagination, Slider, Space, Tag } from 'antd';
 import { addModel, deleteModel, getModelList, showModelGraph } from '@/services/model-config';
 import type { ApiRecord } from '@/types/api';
 import { CurvePreview } from '@/features/environment/CurvePreview';
 import { FormulaPanel } from './FormulaPanel';
-import type { ModelDefinition } from './types';
+import type { ModelDefinition, ModelFieldDefinition } from './types';
 
 interface ModelEditorPageProps<TValues extends object> {
   definition: ModelDefinition<TValues>;
@@ -17,6 +17,60 @@ function getRecordId(record: ApiRecord) {
 }
 
 const sharedFieldOrder = ['cost', 'purchaseCost', 'carbonEmissionFactor'];
+
+interface NumericFieldInputProps<TValues extends object> {
+  field: ModelFieldDefinition<TValues>;
+  value?: number | null;
+  onChange?: (value: number | null) => void;
+  onFocusField: (fieldKey: keyof TValues & string) => void;
+}
+
+function NumericFieldInput<TValues extends object>({
+  field,
+  value,
+  onChange,
+  onFocusField,
+}: NumericFieldInputProps<TValues>) {
+  const activeValue = typeof value === 'number' ? value : field.min ?? 0;
+  const handleFocus = () => onFocusField(field.key);
+
+  const input = (
+    <InputNumber
+      disabled={field.readOnly}
+      min={field.min}
+      max={field.max}
+      step={field.step}
+      placeholder={field.placeholder}
+      suffix={field.unit}
+      style={{ width: '100%' }}
+      value={value ?? undefined}
+      onChange={nextValue => onChange?.(nextValue)}
+      onFocus={handleFocus}
+      onClick={handleFocus}
+    />
+  );
+
+  if (field.control !== 'slider-number') {
+    return input;
+  }
+
+  return (
+    <div className="model-slider-number">
+      <Slider
+        disabled={field.readOnly}
+        min={field.min}
+        max={field.max}
+        step={field.step}
+        value={activeValue}
+        onChange={nextValue => {
+          handleFocus();
+          onChange?.(nextValue);
+        }}
+      />
+      <div className="model-slider-number__input">{input}</div>
+    </div>
+  );
+}
 
 export function ModelEditorPage<TValues extends object>({ definition }: ModelEditorPageProps<TValues>) {
   const { message, modal } = App.useApp();
@@ -336,19 +390,10 @@ export function ModelEditorPage<TValues extends object>({ definition }: ModelEdi
                       key={field.key}
                       name={field.key as never}
                       label={field.label}
+                      style={field.columnStart ? { gridColumnStart: field.columnStart } : undefined}
                       rules={[{ required: !field.readOnly, message: `请输入${field.label}` }]}
                     >
-                      <InputNumber
-                        disabled={field.readOnly}
-                        min={field.min}
-                        max={field.max}
-                        step={field.step}
-                        placeholder={field.placeholder}
-                        suffix={field.unit}
-                        style={{ width: '100%' }}
-                        onFocus={() => setActiveFormulaField(field.key)}
-                        onClick={() => setActiveFormulaField(field.key)}
-                      />
+                      <NumericFieldInput field={field} onFocusField={setActiveFormulaField} />
                     </Form.Item>
                   ))}
                 </div>
@@ -367,19 +412,10 @@ export function ModelEditorPage<TValues extends object>({ definition }: ModelEdi
                       key={field.key}
                       name={field.key as never}
                       label={field.label}
+                      style={field.columnStart ? { gridColumnStart: field.columnStart } : undefined}
                       rules={[{ required: !field.readOnly, message: `请输入${field.label}` }]}
                     >
-                      <InputNumber
-                        disabled={field.readOnly}
-                        min={field.min}
-                        max={field.max}
-                        step={field.step}
-                        placeholder={field.placeholder}
-                        suffix={field.unit}
-                        style={{ width: '100%' }}
-                        onFocus={() => setActiveFormulaField(field.key)}
-                        onClick={() => setActiveFormulaField(field.key)}
-                      />
+                      <NumericFieldInput field={field} onFocusField={setActiveFormulaField} />
                     </Form.Item>
                   ))}
                 </div>

@@ -53,7 +53,7 @@ export const solarPowerDefinition: ModelDefinition<SolarPowerFormValues> = {
   graphUnit: 'kW',
   graphFields: ['ratedPower', 'referenceTemperature', 'temperatureCoefficient', 'referenceIrradiance'],
   fields: [
-    { key: 'ratedPower', recordKey: 'ppvN', label: '额定功率', unit: 'kW', min: 0, max: 5000 },
+    { key: 'ratedPower', recordKey: 'ppvN', label: '额定功率', unit: 'kW', min: 0, max: 5000, placeholder: '100' },
     {
       key: 'referenceTemperature',
       recordKey: 'tref',
@@ -62,6 +62,7 @@ export const solarPowerDefinition: ModelDefinition<SolarPowerFormValues> = {
       min: -100,
       max: 100,
       defaultValue: 25,
+      placeholder: '25',
     },
     {
       key: 'temperatureCoefficient',
@@ -71,6 +72,7 @@ export const solarPowerDefinition: ModelDefinition<SolarPowerFormValues> = {
       min: -1,
       max: 0,
       defaultValue: -0.0045,
+      placeholder: '-0.0045',
     },
     {
       key: 'referenceIrradiance',
@@ -80,6 +82,7 @@ export const solarPowerDefinition: ModelDefinition<SolarPowerFormValues> = {
       min: 0,
       max: 5000,
       defaultValue: 1000,
+      placeholder: '1000',
     },
     {
       key: 'carbonEmissionFactor',
@@ -90,8 +93,8 @@ export const solarPowerDefinition: ModelDefinition<SolarPowerFormValues> = {
       max: 5000,
       defaultValue: 0,
     },
-    { key: 'cost', recordKey: 'cost', label: '维护成本', unit: '元/kWh', min: 0, max: 5000, defaultValue: 0 },
-    { key: 'purchaseCost', recordKey: 'purchaseCost', label: '建设成本', unit: '元', min: 0, max: 99999999, defaultValue: 0 },
+    { key: 'cost', recordKey: 'cost', label: '维护成本', unit: '元/kWh', min: 0, max: 5000, defaultValue: 0, placeholder: '0.020' },
+    { key: 'purchaseCost', recordKey: 'purchaseCost', label: '建设成本', unit: '元', min: 0, max: 99999999, defaultValue: 0, placeholder: '120000' },
   ],
   buildSavePayload: buildSolarPowerSavePayload,
   buildGraphPayload: buildSolarPowerGraphPayload,

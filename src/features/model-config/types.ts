@@ -5,11 +5,13 @@ export interface ModelFieldDefinition<TValues extends object> {
   key: keyof TValues & string;
   recordKey: string;
   label: string;
+  control?: 'number' | 'slider-number';
   unit?: string;
   placeholder?: string;
   min?: number;
   max?: number;
   step?: number;
+  columnStart?: number;
   defaultValue?: number;
   readOnly?: boolean;
 }

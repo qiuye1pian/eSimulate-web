@@ -44,10 +44,18 @@ describe('ModelEditorPage workspace structure', () => {
     expect(source).toContain('deriveTimer');
     expect(source).toContain('step={field.step}');
     expect(source).toContain('placeholder={field.placeholder}');
+    expect(source).toContain('gridColumnStart: field.columnStart');
     expect(source).toContain('handleFormFocus');
     expect(source).toContain('model-parameter-form-body');
     expect(source).toContain('<div className="model-parameter-form-body" onFocusCapture={handleFormFocus}>');
-    expect(source).toContain('onClick={() => setActiveFormulaField(field.key)}');
+    expect(source).toContain('onClick={handleFocus}');
+  });
+
+  it('renders slider-backed numeric fields when requested by a model definition', () => {
+    expect(source).toContain("control !== 'slider-number'");
+    expect(source).toContain('<Slider');
+    expect(source).toContain('model-slider-number');
+    expect(source).toContain('<NumericFieldInput field={field} onFocusField={setActiveFormulaField} />');
   });
 
   it('places formula definitions in the top visual panel instead of inside parameters', () => {

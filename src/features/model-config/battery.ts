@@ -100,6 +100,7 @@ export const batteryDefinition: ModelDefinition<BatteryFormValues> = {
       min: 0,
       max: 1,
       step: 0.001,
+      control: 'slider-number',
       placeholder: '0.001',
     },
     {
@@ -109,6 +110,7 @@ export const batteryDefinition: ModelDefinition<BatteryFormValues> = {
       min: 0,
       max: 1,
       step: 0.001,
+      control: 'slider-number',
       placeholder: '0.999',
     },
     {
@@ -118,6 +120,7 @@ export const batteryDefinition: ModelDefinition<BatteryFormValues> = {
       min: 0,
       max: 1,
       step: 0.00001,
+      control: 'slider-number',
       placeholder: '0.00001',
     },
     { key: 'chargePower', recordKey: 'maxChargePower', label: '蓄电池充电功率', unit: 'kW', min: 0, max: 100000 },
@@ -129,6 +132,7 @@ export const batteryDefinition: ModelDefinition<BatteryFormValues> = {
       min: 0,
       max: 1,
       step: 0.001,
+      control: 'slider-number',
       placeholder: '0.950',
     },
     {
@@ -138,6 +142,7 @@ export const batteryDefinition: ModelDefinition<BatteryFormValues> = {
       min: 0,
       max: 1,
       step: 0.001,
+      control: 'slider-number',
       placeholder: '0.950',
     },
     { key: 'carbonEmissionFactor', recordKey: 'carbonEmissionFactor', label: '碳排放', unit: 'kgCO2/kWh', min: 0, max: 5000, defaultValue: 0 },
