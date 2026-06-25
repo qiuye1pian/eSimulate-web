@@ -40,6 +40,8 @@ describe('ModelEditorPage workspace structure', () => {
 
   it('supports readonly fields and debounced derived values', () => {
     expect(source).toContain('disabled={field.readOnly}');
+    expect(source).toContain('buildFieldRules(field)');
+    expect(source).toContain("type: 'number' as const");
     expect(source).toContain('definition.deriveValues');
     expect(source).toContain('deriveTimer');
     expect(source).toContain('renderFieldLabel(field)');
@@ -55,6 +57,7 @@ describe('ModelEditorPage workspace structure', () => {
   it('renders slider-backed numeric fields when requested by a model definition', () => {
     expect(source).toContain("control !== 'slider-number'");
     expect(source).toContain('<Slider');
+    expect(source).toContain("field.control === 'switch'");
     expect(source).toContain('model-slider-number');
     expect(source).toContain('<NumericFieldInput field={field} onFocusField={setActiveFormulaField} />');
   });

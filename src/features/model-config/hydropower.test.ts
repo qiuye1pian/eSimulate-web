@@ -106,6 +106,7 @@ describe('hydropower model definition', () => {
     expect(fields.downstreamVelocity.placeholder).toBe('1');
     expect(fields.upstreamDensity.columnStart).toBe(1);
     expect(fields.upstreamVelocity.columnStart).toBe(1);
+    expect(fields.gravity.max).toBe(10);
     expect(fields.cost.placeholder).toBe('0.030');
     expect(fields.purchaseCost.placeholder).toBe('200000');
   });

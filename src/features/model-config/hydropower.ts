@@ -138,7 +138,7 @@ export const hydropowerDefinition: ModelDefinition<HydropowerFormValues> = {
     { key: 'upstreamDensity', recordKey: 'p1', label: '上游水密度 p1', unit: 'kg/m³', min: 900, max: 1100, columnStart: 1, defaultValue: 1000 },
     { key: 'downstreamDensity', recordKey: 'p2', label: '下游水密度 p2', unit: 'kg/m³', min: 900, max: 1100, defaultValue: 1000 },
     { key: 'specificWeight', recordKey: 'pg', label: 'ρg', unit: 'N/m³', min: 9000, max: 11000, defaultValue: 9810 },
-    { key: 'gravity', recordKey: 'g', label: '重力加速度 g', unit: 'm/s²', min: 0, max: 20, defaultValue: 9.81 },
+    { key: 'gravity', recordKey: 'g', label: '重力加速度 g', unit: 'm/s²', min: 0, max: 10, defaultValue: 9.81 },
     { key: 'upstreamVelocity', recordKey: 'v1', label: '上游平均流速 v1', unit: 'm³/s', min: 0, max: 1000, columnStart: 1, placeholder: '2' },
     { key: 'downstreamVelocity', recordKey: 'v2', label: '下游平均流速 v2', unit: 'm³/s', min: 0, max: 1000, placeholder: '1' },
     { key: 'carbonEmissionFactor', recordKey: 'carbonEmissionFactor', label: '碳排放', unit: 'kgCO2/kWh', min: 0, max: 5000, defaultValue: 0 },

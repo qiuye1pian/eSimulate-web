@@ -22,4 +22,10 @@ describe('ModelConfigPage model routing', () => {
     expect(source).toContain("modelType === 'gas-boiler'");
     expect(source).toContain('<ModelEditorPage definition={gasBoilerDefinition} />');
   });
+
+  it('renders the migrated thermal power unit model with the shared editor page', () => {
+    expect(source).toContain("import { thermalPowerUnitDefinition } from '@/features/model-config/thermal-power-unit'");
+    expect(source).toContain("modelType === 'thermal-power-unit'");
+    expect(source).toContain('<ModelEditorPage definition={thermalPowerUnitDefinition} />');
+  });
 });

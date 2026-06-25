@@ -5,7 +5,7 @@ export interface ModelFieldDefinition<TValues extends object> {
   key: keyof TValues & string;
   recordKey: string;
   label: string;
-  control?: 'number' | 'slider-number';
+  control?: 'number' | 'slider-number' | 'switch';
   help?: {
     title: string;
     rows: { label: string; range: string; converted: string }[];
@@ -16,7 +16,7 @@ export interface ModelFieldDefinition<TValues extends object> {
   max?: number;
   step?: number;
   columnStart?: number;
-  defaultValue?: number;
+  defaultValue?: number | boolean;
   readOnly?: boolean;
 }
 

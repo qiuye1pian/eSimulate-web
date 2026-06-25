@@ -61,6 +61,11 @@ describe('solar power model definition', () => {
   it('uses short placeholders for editable numeric inputs', () => {
     const fields = Object.fromEntries(solarPowerDefinition.fields.map(field => [field.key, field]));
 
+    expect(fields.ratedPower.min).toBe(1);
+    expect(fields.ratedPower.max).toBe(99999);
+    expect(fields.referenceTemperature.min).toBe(-50);
+    expect(fields.referenceTemperature.max).toBe(50);
+    expect(fields.referenceIrradiance.max).toBe(4000);
     expect(fields.ratedPower.placeholder).toBe('100');
     expect(fields.referenceTemperature.placeholder).toBe('25');
     expect(fields.temperatureCoefficient.placeholder).toBe('-0.0045');

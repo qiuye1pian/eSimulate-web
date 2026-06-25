@@ -1,7 +1,8 @@
 import { type FocusEvent, useEffect, useRef, useState } from 'react';
 import { DeleteOutlined, PlusOutlined, QuestionCircleOutlined, ReloadOutlined, SaveOutlined, SearchOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { App, Button, Form, Input, InputNumber, List, Pagination, Popover, Slider, Space, Tag } from 'antd';
+import { App, Button, Form, Input, InputNumber, List, Pagination, Popover, Slider, Space, Switch, Tag } from 'antd';
+import type { Rule } from 'antd/es/form';
 import { addModel, deleteModel, getModelList, showModelGraph } from '@/services/model-config';
 import type { ApiRecord } from '@/types/api';
 import { CurvePreview } from '@/features/environment/CurvePreview';
@@ -17,6 +18,27 @@ function getRecordId(record: ApiRecord) {
 }
 
 const sharedFieldOrder = ['cost', 'purchaseCost', 'carbonEmissionFactor'];
+
+function buildFieldRules<TValues extends object>(field: ModelFieldDefinition<TValues>): Rule[] {
+  if (field.readOnly || field.control === 'switch') {
+    return [];
+  }
+
+  const rules: Rule[] = [{ required: true, message: `请输入${field.label}` }];
+  if (field.min !== undefined || field.max !== undefined) {
+    rules.push({
+      type: 'number' as const,
+      min: field.min,
+      max: field.max,
+      message: field.min !== undefined && field.max !== undefined
+        ? `${field.label} 必须在 ${field.min} 到 ${field.max} 之间`
+        : field.min !== undefined
+          ? `${field.label} 必须大于或等于 ${field.min}`
+          : `${field.label} 必须小于或等于 ${field.max}`,
+    });
+  }
+  return rules;
+}
 
 function renderFieldLabel<TValues extends object>(field: ModelFieldDefinition<TValues>) {
   if (!field.help) {
@@ -48,8 +70,8 @@ function renderFieldLabel<TValues extends object>(field: ModelFieldDefinition<TV
 
 interface NumericFieldInputProps<TValues extends object> {
   field: ModelFieldDefinition<TValues>;
-  value?: number | null;
-  onChange?: (value: number | null) => void;
+  value?: number | boolean | null;
+  onChange?: (value: number | boolean | null) => void;
   onFocusField: (fieldKey: keyof TValues & string) => void;
 }
 
@@ -62,6 +84,17 @@ function NumericFieldInput<TValues extends object>({
   const activeValue = typeof value === 'number' ? value : field.min ?? 0;
   const handleFocus = () => onFocusField(field.key);
 
+  if (field.control === 'switch') {
+    return (
+      <Switch
+        checked={Boolean(value)}
+        checkedChildren="运行"
+        unCheckedChildren="停机"
+        onChange={nextValue => onChange?.(nextValue)}
+      />
+    );
+  }
+
   const input = (
     <InputNumber
       disabled={field.readOnly}
@@ -71,7 +104,7 @@ function NumericFieldInput<TValues extends object>({
       placeholder={field.placeholder}
       suffix={field.unit}
       style={{ width: '100%' }}
-      value={value ?? undefined}
+      value={typeof value === 'number' ? value : undefined}
       onChange={nextValue => onChange?.(nextValue)}
       onFocus={handleFocus}
       onClick={handleFocus}
@@ -419,7 +452,7 @@ export function ModelEditorPage<TValues extends object>({ definition }: ModelEdi
                       name={field.key as never}
                       label={renderFieldLabel(field)}
                       style={field.columnStart ? { gridColumnStart: field.columnStart } : undefined}
-                      rules={[{ required: !field.readOnly, message: `请输入${field.label}` }]}
+                      rules={buildFieldRules(field)}
                     >
                       <NumericFieldInput field={field} onFocusField={setActiveFormulaField} />
                     </Form.Item>
@@ -441,7 +474,7 @@ export function ModelEditorPage<TValues extends object>({ definition }: ModelEdi
                       name={field.key as never}
                       label={renderFieldLabel(field)}
                       style={field.columnStart ? { gridColumnStart: field.columnStart } : undefined}
-                      rules={[{ required: !field.readOnly, message: `请输入${field.label}` }]}
+                      rules={buildFieldRules(field)}
                     >
                       <NumericFieldInput field={field} onFocusField={setActiveFormulaField} />
                     </Form.Item>
