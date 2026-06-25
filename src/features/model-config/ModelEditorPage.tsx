@@ -1,7 +1,7 @@
 import { type FocusEvent, useEffect, useRef, useState } from 'react';
-import { DeleteOutlined, PlusOutlined, ReloadOutlined, SaveOutlined, SearchOutlined } from '@ant-design/icons';
+import { DeleteOutlined, PlusOutlined, QuestionCircleOutlined, ReloadOutlined, SaveOutlined, SearchOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { App, Button, Form, Input, InputNumber, List, Pagination, Slider, Space, Tag } from 'antd';
+import { App, Button, Form, Input, InputNumber, List, Pagination, Popover, Slider, Space, Tag } from 'antd';
 import { addModel, deleteModel, getModelList, showModelGraph } from '@/services/model-config';
 import type { ApiRecord } from '@/types/api';
 import { CurvePreview } from '@/features/environment/CurvePreview';
@@ -17,6 +17,34 @@ function getRecordId(record: ApiRecord) {
 }
 
 const sharedFieldOrder = ['cost', 'purchaseCost', 'carbonEmissionFactor'];
+
+function renderFieldLabel<TValues extends object>(field: ModelFieldDefinition<TValues>) {
+  if (!field.help) {
+    return field.label;
+  }
+
+  return (
+    <span className="model-field-label">
+      {field.label}
+      <Popover
+        title={field.help.title}
+        content={(
+          <div className="model-field-help">
+            {field.help.rows.map(row => (
+              <div className="model-field-help__row" key={row.label}>
+                <strong>{row.label}</strong>
+                <span>{row.range}</span>
+                <span>{row.converted}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      >
+        <QuestionCircleOutlined className="model-field-label__help" />
+      </Popover>
+    </span>
+  );
+}
 
 interface NumericFieldInputProps<TValues extends object> {
   field: ModelFieldDefinition<TValues>;
@@ -389,7 +417,7 @@ export function ModelEditorPage<TValues extends object>({ definition }: ModelEdi
                     <Form.Item
                       key={field.key}
                       name={field.key as never}
-                      label={field.label}
+                      label={renderFieldLabel(field)}
                       style={field.columnStart ? { gridColumnStart: field.columnStart } : undefined}
                       rules={[{ required: !field.readOnly, message: `请输入${field.label}` }]}
                     >
@@ -411,7 +439,7 @@ export function ModelEditorPage<TValues extends object>({ definition }: ModelEdi
                     <Form.Item
                       key={field.key}
                       name={field.key as never}
-                      label={field.label}
+                      label={renderFieldLabel(field)}
                       style={field.columnStart ? { gridColumnStart: field.columnStart } : undefined}
                       rules={[{ required: !field.readOnly, message: `请输入${field.label}` }]}
                     >

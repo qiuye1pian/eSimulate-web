@@ -16,4 +16,10 @@ describe('ModelConfigPage model routing', () => {
     expect(source).toContain("modelType === 'solar-thermal'");
     expect(source).toContain('<ModelEditorPage definition={solarThermalDefinition} />');
   });
+
+  it('renders the migrated gas boiler model with the shared editor page', () => {
+    expect(source).toContain("import { gasBoilerDefinition } from '@/features/model-config/gas-boiler'");
+    expect(source).toContain("modelType === 'gas-boiler'");
+    expect(source).toContain('<ModelEditorPage definition={gasBoilerDefinition} />');
+  });
 });

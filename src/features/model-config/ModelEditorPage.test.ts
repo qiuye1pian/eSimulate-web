@@ -42,6 +42,7 @@ describe('ModelEditorPage workspace structure', () => {
     expect(source).toContain('disabled={field.readOnly}');
     expect(source).toContain('definition.deriveValues');
     expect(source).toContain('deriveTimer');
+    expect(source).toContain('renderFieldLabel(field)');
     expect(source).toContain('step={field.step}');
     expect(source).toContain('placeholder={field.placeholder}');
     expect(source).toContain('gridColumnStart: field.columnStart');

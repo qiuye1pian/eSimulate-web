@@ -327,6 +327,31 @@ body {
   font-weight: 600;
 }
 
+.model-field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.model-field-label__help {
+  color: #94a3b8;
+  cursor: help;
+}
+
+.model-field-help {
+  display: grid;
+  gap: 8px;
+  min-width: 280px;
+}
+
+.model-field-help__row {
+  display: grid;
+  grid-template-columns: 90px 96px 1fr;
+  gap: 10px;
+  color: #475569;
+  font-size: 12px;
+}
+
 .model-parameter-grid .ant-input-number-suffix {
   color: #718096;
   font-size: 11px;

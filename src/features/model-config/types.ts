@@ -6,6 +6,10 @@ export interface ModelFieldDefinition<TValues extends object> {
   recordKey: string;
   label: string;
   control?: 'number' | 'slider-number';
+  help?: {
+    title: string;
+    rows: { label: string; range: string; converted: string }[];
+  };
   unit?: string;
   placeholder?: string;
   min?: number;
