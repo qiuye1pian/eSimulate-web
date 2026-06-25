@@ -34,4 +34,10 @@ describe('ModelConfigPage model routing', () => {
     expect(source).toContain("modelType === 'cogeneration'");
     expect(source).toContain('<ModelEditorPage definition={cogenerationDefinition} />');
   });
+
+  it('renders the migrated pumped storage model with the shared editor page', () => {
+    expect(source).toContain("import { pumpedStorageDefinition } from '@/features/model-config/pumped-storage'");
+    expect(source).toContain("modelType === 'pumped-storage'");
+    expect(source).toContain('<ModelEditorPage definition={pumpedStorageDefinition} />');
+  });
 });

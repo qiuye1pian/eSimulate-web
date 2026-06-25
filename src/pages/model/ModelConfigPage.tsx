@@ -4,6 +4,7 @@ import { batteryDefinition } from '@/features/model-config/battery';
 import { cogenerationDefinition } from '@/features/model-config/cogeneration';
 import { gasBoilerDefinition } from '@/features/model-config/gas-boiler';
 import { hydropowerDefinition } from '@/features/model-config/hydropower';
+import { pumpedStorageDefinition } from '@/features/model-config/pumped-storage';
 import { solarPowerDefinition } from '@/features/model-config/solar-power';
 import { solarThermalDefinition } from '@/features/model-config/solar-thermal';
 import { thermalPowerUnitDefinition } from '@/features/model-config/thermal-power-unit';
@@ -38,6 +39,7 @@ export function ModelConfigPage() {
       {modelType === 'gas-boiler' ? <ModelEditorPage definition={gasBoilerDefinition} /> : null}
       {modelType === 'thermal-power-unit' ? <ModelEditorPage definition={thermalPowerUnitDefinition} /> : null}
       {modelType === 'cogeneration' ? <ModelEditorPage definition={cogenerationDefinition} /> : null}
+      {modelType === 'pumped-storage' ? <ModelEditorPage definition={pumpedStorageDefinition} /> : null}
     </section>
   );
 }
