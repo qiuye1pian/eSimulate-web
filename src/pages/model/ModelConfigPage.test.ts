@@ -28,4 +28,10 @@ describe('ModelConfigPage model routing', () => {
     expect(source).toContain("modelType === 'thermal-power-unit'");
     expect(source).toContain('<ModelEditorPage definition={thermalPowerUnitDefinition} />');
   });
+
+  it('renders the migrated cogeneration model with the shared editor page', () => {
+    expect(source).toContain("import { cogenerationDefinition } from '@/features/model-config/cogeneration'");
+    expect(source).toContain("modelType === 'cogeneration'");
+    expect(source).toContain('<ModelEditorPage definition={cogenerationDefinition} />');
+  });
 });

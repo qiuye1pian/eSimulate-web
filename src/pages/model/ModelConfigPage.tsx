@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { ModelEditorPage } from '@/features/model-config/ModelEditorPage';
 import { batteryDefinition } from '@/features/model-config/battery';
+import { cogenerationDefinition } from '@/features/model-config/cogeneration';
 import { gasBoilerDefinition } from '@/features/model-config/gas-boiler';
 import { hydropowerDefinition } from '@/features/model-config/hydropower';
 import { solarPowerDefinition } from '@/features/model-config/solar-power';
@@ -36,6 +37,7 @@ export function ModelConfigPage() {
       {modelType === 'solar-thermal' ? <ModelEditorPage definition={solarThermalDefinition} /> : null}
       {modelType === 'gas-boiler' ? <ModelEditorPage definition={gasBoilerDefinition} /> : null}
       {modelType === 'thermal-power-unit' ? <ModelEditorPage definition={thermalPowerUnitDefinition} /> : null}
+      {modelType === 'cogeneration' ? <ModelEditorPage definition={cogenerationDefinition} /> : null}
     </section>
   );
 }
