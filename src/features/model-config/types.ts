@@ -1,6 +1,8 @@
 import type { ModelEndpoint } from '@/services/model-config';
 import type { ApiRecord } from '@/types/api';
 
+export const MAX_PURCHASE_COST = 99_999_999_999;
+
 export interface ModelFieldDefinition<TValues extends object> {
   key: keyof TValues & string;
   recordKey: string;

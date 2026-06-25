@@ -60,6 +60,7 @@ describe('wind power model definition', () => {
     expect(fields.ratedSpeed.placeholder).toBe('12');
     expect(fields.cutOutSpeed.placeholder).toBe('25');
     expect(fields.cost.placeholder).toBe('0.100');
+    expect(fields.purchaseCost.max).toBe(99_999_999_999);
     expect(fields.purchaseCost.placeholder).toBe('5000000');
   });
 });

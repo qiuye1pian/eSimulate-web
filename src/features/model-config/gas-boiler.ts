@@ -1,5 +1,5 @@
 import type { ApiRecord } from '@/types/api';
-import type { ModelDefinition } from './types';
+import { MAX_PURCHASE_COST, type ModelDefinition } from './types';
 
 export interface GasBoilerFormValues {
   modelName: string;
@@ -66,7 +66,7 @@ export const gasBoilerDefinition: ModelDefinition<GasBoilerFormValues> = {
     },
     { key: 'carbonEmissionFactor', recordKey: 'carbonEmissionFactor', label: '碳排放', unit: 'kgCO2/kWh', min: 0, max: 5000, defaultValue: 0 },
     { key: 'cost', recordKey: 'cost', label: '维护成本', unit: '元/kWh', min: 0, max: 5000, defaultValue: 0, placeholder: '0.120' },
-    { key: 'purchaseCost', recordKey: 'purchaseCost', label: '建设成本', unit: '元', min: 0, max: 99999999, defaultValue: 0, placeholder: '200000' },
+    { key: 'purchaseCost', recordKey: 'purchaseCost', label: '建设成本', unit: '元', min: 0, max: MAX_PURCHASE_COST, defaultValue: 0, placeholder: '200000' },
   ],
   buildSavePayload: buildGasBoilerSavePayload,
   validate: validateGasBoilerParameters,

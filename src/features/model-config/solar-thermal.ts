@@ -1,5 +1,5 @@
 import type { ApiRecord } from '@/types/api';
-import type { ModelDefinition } from './types';
+import { MAX_PURCHASE_COST, type ModelDefinition } from './types';
 
 export interface SolarThermalFormValues {
   modelName: string;
@@ -58,7 +58,7 @@ export const solarThermalDefinition: ModelDefinition<SolarThermalFormValues> = {
     },
     { key: 'carbonEmissionFactor', recordKey: 'carbonEmissionFactor', label: '碳排放', unit: 'kgCO2/kWh', min: 0, max: 5000, defaultValue: 0 },
     { key: 'cost', recordKey: 'cost', label: '维护成本', unit: '元/kWh', min: 0, max: 5000, defaultValue: 0, placeholder: '0.040' },
-    { key: 'purchaseCost', recordKey: 'purchaseCost', label: '建设成本', unit: '元', min: 0, max: 99999999, defaultValue: 0, placeholder: '300000' },
+    { key: 'purchaseCost', recordKey: 'purchaseCost', label: '建设成本', unit: '元', min: 0, max: MAX_PURCHASE_COST, defaultValue: 0, placeholder: '300000' },
   ],
   buildSavePayload: buildSolarThermalSavePayload,
   validate: validateSolarThermalParameters,
