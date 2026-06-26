@@ -8,6 +8,7 @@ import { pumpedStorageDefinition } from '@/features/model-config/pumped-storage'
 import { solarPowerDefinition } from '@/features/model-config/solar-power';
 import { solarThermalDefinition } from '@/features/model-config/solar-thermal';
 import { thermalPowerUnitDefinition } from '@/features/model-config/thermal-power-unit';
+import { thermalStorageDefinition } from '@/features/model-config/thermal-storage';
 import { windPowerDefinition } from '@/features/model-config/wind-power';
 
 const titles: Record<string, string> = {
@@ -40,6 +41,7 @@ export function ModelConfigPage() {
       {modelType === 'thermal-power-unit' ? <ModelEditorPage definition={thermalPowerUnitDefinition} /> : null}
       {modelType === 'cogeneration' ? <ModelEditorPage definition={cogenerationDefinition} /> : null}
       {modelType === 'pumped-storage' ? <ModelEditorPage definition={pumpedStorageDefinition} /> : null}
+      {modelType === 'thermal-storage' ? <ModelEditorPage definition={thermalStorageDefinition} /> : null}
     </section>
   );
 }

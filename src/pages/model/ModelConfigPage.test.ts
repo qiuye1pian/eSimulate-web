@@ -40,4 +40,10 @@ describe('ModelConfigPage model routing', () => {
     expect(source).toContain("modelType === 'pumped-storage'");
     expect(source).toContain('<ModelEditorPage definition={pumpedStorageDefinition} />');
   });
+
+  it('renders the migrated thermal storage model with the shared editor page', () => {
+    expect(source).toContain("import { thermalStorageDefinition } from '@/features/model-config/thermal-storage'");
+    expect(source).toContain("modelType === 'thermal-storage'");
+    expect(source).toContain('<ModelEditorPage definition={thermalStorageDefinition} />');
+  });
 });

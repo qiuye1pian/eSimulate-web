@@ -17,7 +17,7 @@ export function EnvironmentResourcePage() {
       <h1 className="page-shell__title">{definition.title}</h1>
       <p className="page-shell__description">
         {definition.key === 'grid-pricing'
-          ? '电网电价沿用旧版的模型列表和参数表单流程。'
+          ? '维护购电电价、碳排放因子和电价方案列表。'
           : '列表、搜索、上传、下载、删除和曲线预览使用同一套资源模板。'}
       </p>
       {definition.key === 'grid-pricing' ? <GridPricingPage /> : <ResourceListPage definition={definition} />}

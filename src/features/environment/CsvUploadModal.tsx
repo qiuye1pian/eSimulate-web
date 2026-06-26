@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { Form, Input, Modal, Upload, message } from 'antd';
+import { useEffect, useState } from 'react';
+import { UploadOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Modal, Upload, message } from 'antd';
 import type { UploadFile } from 'antd';
 
 interface CsvUploadModalProps {
@@ -13,11 +14,17 @@ interface CsvUploadModalProps {
 export function CsvUploadModal({ open, title, uploading = false, onCancel, onSubmit }: CsvUploadModalProps) {
   const [form] = Form.useForm<{ schemeName: string }>();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [resetVersion, setResetVersion] = useState(0);
 
   const reset = () => {
     form.resetFields();
     setFileList([]);
+    setResetVersion(version => version + 1);
   };
+
+  useEffect(() => {
+    reset();
+  }, [form, open, title]);
 
   const handleCancel = () => {
     reset();
@@ -49,25 +56,29 @@ export function CsvUploadModal({ open, title, uploading = false, onCancel, onSub
           <Input placeholder="请输入方案名称" />
         </Form.Item>
         <Form.Item label="CSV 文件" required>
-          <Upload
-            accept=".csv,text/csv"
-            fileList={fileList}
-            maxCount={1}
-            beforeUpload={(file) => {
-              const isCsv = file.name.toLowerCase().endsWith('.csv') || file.type === 'text/csv';
-              if (!isCsv) {
-                message.error('只能上传 CSV 文件');
-                return Upload.LIST_IGNORE;
-              }
-              setFileList([{ uid: file.uid, name: file.name, status: 'done', originFileObj: file }]);
-              return false;
-            }}
-            onRemove={() => {
-              setFileList([]);
-            }}
-          >
-            <span className="ant-btn">选择文件</span>
-          </Upload>
+          <div className="csv-upload-picker">
+            <Upload
+              key={`${title}-${resetVersion}`}
+              accept=".csv,text/csv"
+              fileList={fileList}
+              maxCount={1}
+              beforeUpload={(file) => {
+                const isCsv = file.name.toLowerCase().endsWith('.csv') || file.type === 'text/csv';
+                if (!isCsv) {
+                  message.error('只能上传 CSV 文件');
+                  return Upload.LIST_IGNORE;
+                }
+                setFileList([{ uid: file.uid, name: file.name, status: 'done', originFileObj: file }]);
+                return false;
+              }}
+              onRemove={() => {
+                setFileList([]);
+              }}
+            >
+              <Button icon={<UploadOutlined />}>选择 CSV 文件</Button>
+            </Upload>
+            <span>支持后端解析的两列 CSV：时间、负荷值</span>
+          </div>
         </Form.Item>
       </Form>
     </Modal>

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
+import { DeleteOutlined, DownloadOutlined, PlusOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { App, Button, Card, Input, Popconfirm, Space, Table } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
+import { App, Button, Empty, Input, List, Pagination, Popconfirm, Space, Tag } from 'antd';
 import {
   deleteResource,
   downloadResource,
@@ -96,83 +96,128 @@ export function ResourceListPage({ definition }: ResourceListPageProps) {
   const currentPage = listQuery.data?.data?.page ?? page;
   const pageSize = listQuery.data?.data?.size ?? 10;
 
-  const columns: ColumnsType<ApiRecord> = [
-    { title: '名称', dataIndex: 'name', render: (_, record) => getRecordName(record) },
-    { title: '创建时间', dataIndex: 'createTime', render: value => value ? String(value) : '-' },
-    {
-      title: '操作',
-      width: 180,
-      render: (_, record) => {
-        const id = getRecordId(record);
-        return (
-          <Space>
-            {definition.supportsDownload ? (
-              <Button type="link" size="small" disabled={id === undefined} onClick={() => downloadMutation.mutate(record)}>
-                下载
-              </Button>
-            ) : null}
-            <Popconfirm
-              title="确认删除这条数据吗？"
-              okText="删除"
-              cancelText="取消"
-              onConfirm={() => id !== undefined && deleteMutation.mutate(id)}
-            >
-              <Button danger type="link" size="small" disabled={id === undefined}>
-                删除
-              </Button>
-            </Popconfirm>
-          </Space>
-        );
-      },
-    },
-  ];
-
   return (
-    <section className="resource-page">
-      <Card>
-        <div className="resource-page__toolbar">
+    <section className="resource-workspace">
+      <aside className="resource-workspace__catalog">
+        <div className="model-panel-heading">
+          <div>
+            <span className="model-panel-heading__eyebrow">RESOURCE CATALOG</span>
+            <h2>{definition.title}方案</h2>
+          </div>
+          <Tag bordered={false}>{total} 条</Tag>
+        </div>
+
+        <Space.Compact className="model-catalog-search" block>
           <Input.Search
             allowClear
+            prefix={<SearchOutlined />}
             placeholder={`搜索${definition.title}`}
-            style={{ maxWidth: 320 }}
             onSearch={(value) => {
               setPage(1);
               setKeyword(value.trim());
             }}
           />
-          <Space>
-            <Button onClick={() => listQuery.refetch()}>刷新</Button>
+        </Space.Compact>
+
+        <List
+          className="resource-catalog-list"
+          loading={listQuery.isLoading || deleteMutation.isPending}
+          dataSource={rows}
+          locale={{ emptyText: '暂无方案数据' }}
+          renderItem={(record) => {
+            const id = getRecordId(record);
+            const selected = selectedRecord && getRecordId(selectedRecord) === id;
+            const name = getRecordName(record);
+
+            return (
+              <List.Item
+                className={selected ? 'resource-catalog-list__selected' : undefined}
+                actions={[
+                  definition.supportsDownload ? (
+                    <Button
+                      key="download"
+                      aria-label={`下载${name}`}
+                      type="text"
+                      icon={<DownloadOutlined />}
+                      loading={downloadMutation.isPending}
+                      disabled={id === undefined}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        downloadMutation.mutate(record);
+                      }}
+                    />
+                  ) : null,
+                  <Popconfirm
+                    key="delete"
+                    title="确认删除这条数据吗？"
+                    okText="删除"
+                    cancelText="取消"
+                    onConfirm={() => id !== undefined && deleteMutation.mutate(id)}
+                  >
+                    <Button
+                      danger
+                      aria-label={`删除${name}`}
+                      type="text"
+                      icon={<DeleteOutlined />}
+                      disabled={id === undefined}
+                      onClick={event => event.stopPropagation()}
+                    />
+                  </Popconfirm>,
+                ].filter(Boolean)}
+                onClick={() => setSelectedRecord(record)}
+              >
+                <div className="model-catalog-item">
+                  <span className="model-catalog-item__status" />
+                  <div>
+                    <strong>{name}</strong>
+                    <span>{selected ? '正在预览' : '点击预览曲线'}</span>
+                  </div>
+                </div>
+              </List.Item>
+            );
+          }}
+        />
+
+        <div className="model-catalog-footer">
+          {total > 0 ? (
+            <Pagination
+              simple
+              current={currentPage}
+              pageSize={pageSize}
+              total={total}
+              onChange={setPage}
+            />
+          ) : <span />}
+          <span>共 {total} 条记录</span>
+        </div>
+      </aside>
+
+      <main className="resource-workspace__main">
+        <div className="model-panel-heading model-panel-heading--inline">
+          <div>
+            <span className="model-panel-heading__eyebrow">CURVE PREVIEW</span>
+            <h2>{selectedRecord ? getRecordName(selectedRecord) : `${definition.title}曲线`}</h2>
+          </div>
+          <div className="model-panel-heading__actions">
+            <Button icon={<ReloadOutlined />} onClick={() => listQuery.refetch()}>
+              刷新列表
+            </Button>
             {definition.supportsCsvUpload ? (
-              <Button type="primary" onClick={() => setUploadOpen(true)}>
+              <Button type="primary" icon={<PlusOutlined />} onClick={() => setUploadOpen(true)}>
                 上传 CSV
               </Button>
             ) : null}
-          </Space>
+          </div>
         </div>
-        <Table
-          rowKey={(record) => String(getRecordId(record) ?? getRecordName(record))}
-          loading={listQuery.isLoading || deleteMutation.isPending}
-          columns={columns}
-          dataSource={rows}
-          rowSelection={{
-            type: 'radio',
-            selectedRowKeys: selectedRecord ? [String(getRecordId(selectedRecord))] : [],
-            onSelect: record => setSelectedRecord(record),
-          }}
-          pagination={{
-            current: currentPage,
-            pageSize,
-            total,
-            onChange: setPage,
-          }}
-        />
-      </Card>
 
-      {definition.supportsCurvePreview ? (
-        <Card title="曲线预览" style={{ marginTop: 16 }}>
-          <CurvePreview data={curveQuery.data?.data} loading={curveQuery.isLoading} unit={definition.chartUnit} />
-        </Card>
-      ) : null}
+        {definition.supportsCurvePreview ? (
+          <div className="resource-curve-panel">
+            <CurvePreview data={curveQuery.data?.data} loading={curveQuery.isLoading} unit={definition.chartUnit} />
+          </div>
+        ) : (
+          <Empty description="当前资源暂无曲线预览" />
+        )}
+      </main>
 
       {definition.supportsCsvUpload ? (
         <CsvUploadModal
