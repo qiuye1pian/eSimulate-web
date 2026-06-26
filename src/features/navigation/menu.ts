@@ -28,6 +28,12 @@ export const routeGroups = {
   system: ['/system/users', '/system/roles'],
 } as const;
 
+export function getOpenMenuKeys(pathname: string) {
+  return Object.entries(routeGroups)
+    .filter(([, routes]) => (routes as readonly string[]).includes(pathname))
+    .map(([key]) => key);
+}
+
 export const mainMenuItems: MenuItem[] = [
   {
     key: 'simulation',
