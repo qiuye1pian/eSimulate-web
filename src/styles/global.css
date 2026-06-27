@@ -312,6 +312,59 @@ body {
   min-height: 430px;
 }
 
+.optimization-page {
+  min-height: calc(100vh - 104px);
+}
+
+.optimization-configuration {
+  display: grid;
+  gap: 14px;
+}
+
+.optimization-section {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+}
+
+.optimization-parameter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.optimization-parameter {
+  display: grid;
+  gap: 6px;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.optimization-parameter .ant-input-number-group-wrapper,
+.optimization-parameter .ant-input-number {
+  width: 100%;
+}
+
+.optimization-task-meta {
+  margin-top: 8px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.optimization-result-valid {
+  color: #0f766e;
+  font-weight: 700;
+}
+
+.optimization-result-invalid {
+  color: #dc2626;
+  font-weight: 700;
+}
+
 @media (max-width: 760px) {
   .simulation-page__header,
   .simulation-configuration-toolbar {
