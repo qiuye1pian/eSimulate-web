@@ -1,55 +1,24 @@
 import { useEffect, useRef } from 'react';
-import { Card, Col, Empty, Row, Statistic } from 'antd';
+import { QuestionCircleOutlined } from '@ant-design/icons';
+import { Alert, Card, Empty, Popover, Progress } from 'antd';
 import type { ApiRecord } from '@/types/api';
-import type { NormalizedSimulationResult, SimulationIndicator, SimulationPieIndicator } from './simulation-utils';
+import type {
+  NormalizedSimulationResult,
+  SimulationIndicatorTone,
+  SimulationSummaryIndicator,
+} from './simulation-utils';
 
 function normalizeObject(value: unknown): ApiRecord {
   return value && typeof value === 'object' && !Array.isArray(value) ? value as ApiRecord : {};
 }
 
-export function buildPieOption(indicator: SimulationPieIndicator) {
-  return {
-    color: ['#0f766e', '#cbd5e1'],
-    title: {
-      text: indicator.label,
-      left: 'center',
-      top: 8,
-      textStyle: { color: '#172033', fontSize: 14, fontWeight: 700 },
-    },
-    tooltip: { trigger: 'item', formatter: '{b}: {c}%' },
-    legend: {
-      bottom: 8,
-      left: 'center',
-      textStyle: { color: '#64748b' },
-    },
-    series: [
-      {
-        type: 'pie',
-        radius: ['42%', '66%'],
-        center: ['50%', '50%'],
-        data: [
-          { value: indicator.partOneValue, name: indicator.partOne },
-          { value: indicator.partTwoValue, name: indicator.partTwo },
-        ],
-        label: { formatter: '{d}%' },
-        emphasis: {
-          itemStyle: {
-            shadowBlur: 10,
-            shadowOffsetX: 0,
-            shadowColor: 'rgba(15, 23, 42, 0.18)',
-          },
-        },
-      },
-    ],
-  };
-}
-
 export function buildStackedChartOption(data: unknown, energyLabel: string) {
   const chartData = normalizeObject(data);
+  const titleText = energyLabel === '电' ? '电侧功率平衡' : '热侧供需平衡';
   return {
     color: ['#0f766e', '#2563eb', '#d97706', '#7c3aed', '#dc2626', '#0891b2', '#65a30d'],
     title: {
-      text: `生产运行模拟示意图(${energyLabel})`,
+      text: titleText,
       textStyle: { color: '#172033', fontSize: 15, fontWeight: 700 },
     },
     tooltip: {
@@ -72,6 +41,23 @@ export function buildStackedChartOption(data: unknown, energyLabel: string) {
       },
     ],
     series: Array.isArray(chartData.series) ? chartData.series : [],
+  };
+}
+
+export function getSummaryToneClass(tone: SimulationIndicatorTone) {
+  return `simulation-summary-card--${tone}`;
+}
+
+export function getSummaryHelp(indicationName: string) {
+  if (indicationName !== 'TotalCost') {
+    return undefined;
+  }
+  return {
+    title: '年度总成本计算方法',
+    lines: [
+      '年度总成本 = 年化投资成本 + 公共电网交互费用 + 年度运行维护费用 + 可控机组启停及运行成本',
+      '年化投资成本由各设备建设成本、设备数量、折现率和使用年限折算得到。',
+    ],
   };
 }
 
@@ -119,13 +105,54 @@ function ChartPanel({ option, className, emptyText }: ChartPanelProps) {
   return <div className={className ?? 'simulation-chart'} ref={chartRef} />;
 }
 
-function getIndicatorDescription(indicator: SimulationIndicator) {
-  return String(indicator.description ?? indicator.indicationName ?? '-');
+function getProgressColor(tone: SimulationIndicatorTone) {
+  if (tone === 'warning') {
+    return '#d97706';
+  }
+  if (tone === 'good') {
+    return '#0f766e';
+  }
+  return '#2563eb';
 }
 
-function getIndicatorValue(indicator: SimulationIndicator) {
-  const value = Number(indicator.indication);
-  return Number.isFinite(value) ? value : 0;
+function SimulationSummaryCard({ indicator }: { indicator: SimulationSummaryIndicator }) {
+  const isPercent = indicator.unit === '%';
+  const help = getSummaryHelp(indicator.indicationName);
+
+  return (
+    <Card className={`simulation-summary-card ${getSummaryToneClass(indicator.tone)}`}>
+      <div className="simulation-summary-card__label">
+        <span>{indicator.label}</span>
+        {help ? (
+          <Popover
+            title={help.title}
+            content={(
+              <div className="simulation-summary-help">
+                {help.lines.map(line => <p key={line}>{line}</p>)}
+              </div>
+            )}
+          >
+            <QuestionCircleOutlined className="simulation-summary-card__help" />
+          </Popover>
+        ) : null}
+      </div>
+      <div className="simulation-summary-card__value">
+        <strong>{indicator.formattedValue}</strong>
+        <span>{indicator.unit}</span>
+      </div>
+      {indicator.magnitudeText ? (
+        <div className="simulation-summary-card__magnitude">{indicator.magnitudeText}</div>
+      ) : null}
+      {isPercent ? (
+        <Progress
+          percent={indicator.value}
+          size="small"
+          strokeColor={getProgressColor(indicator.tone)}
+          showInfo={false}
+        />
+      ) : null}
+    </Card>
+  );
 }
 
 export function SimulationResultPanel({ result }: { result?: NormalizedSimulationResult }) {
@@ -133,38 +160,26 @@ export function SimulationResultPanel({ result }: { result?: NormalizedSimulatio
     return <Empty description="运行仿真后展示结果" />;
   }
 
+  if (result.resultType === 'FAILED') {
+    return (
+      <Alert
+        showIcon
+        type="warning"
+        message="仿真失败"
+        description={result.message || '请检查负荷、模型、环境和数量配置后重新运行。'}
+      />
+    );
+  }
+
   return (
     <div className="simulation-results">
-      <Row gutter={[12, 12]}>
-        {result.statIndicators.length ? result.statIndicators.map(indicator => (
-          <Col xs={24} md={12} key={String(indicator.indicationName ?? indicator.description)}>
-            <Card>
-              <Statistic
-                title={getIndicatorDescription(indicator)}
-                value={getIndicatorValue(indicator)}
-                precision={2}
-                valueStyle={{ color: '#0f766e' }}
-              />
-            </Card>
-          </Col>
-        )) : (
-          <Col span={24}>
-            <Empty description="暂无指标数据" />
-          </Col>
-        )}
-      </Row>
-
-      <div className="simulation-pie-grid">
-        {result.pieIndicators.length ? result.pieIndicators.map(indicator => (
-          <Card key={indicator.indicationName}>
-            <ChartPanel
-              className="simulation-pie-chart"
-              option={buildPieOption(indicator)}
-              emptyText="暂无占比数据"
-            />
-          </Card>
-        )) : <Empty description="暂无占比数据" />}
-      </div>
+      {result.summaryIndicators.length ? (
+        <div className="simulation-summary-grid">
+          {result.summaryIndicators.map(indicator => (
+            <SimulationSummaryCard key={indicator.indicationName} indicator={indicator} />
+          ))}
+        </div>
+      ) : <Empty description="暂无指标数据" />}
 
       <Card>
         <ChartPanel

@@ -1,25 +1,23 @@
 import { describe, expect, it } from 'vitest';
-import { buildPieOption, buildStackedChartOption } from './SimulationCharts';
+import { buildStackedChartOption, getSummaryHelp, getSummaryToneClass } from './SimulationCharts';
 
 describe('simulation chart options', () => {
-  it('builds pie option from normalized indicator data', () => {
-    const option = buildPieOption({
-      indicationName: 'RenewableEnergyShare',
-      label: '可再生能源占比',
-      partOne: '可再生能源',
-      partTwo: '不可再生能源',
-      partOneValue: 70,
-      partTwoValue: 30,
-    });
+  it('maps summary tones to stable class names', () => {
+    expect(getSummaryToneClass('good')).toBe('simulation-summary-card--good');
+    expect(getSummaryToneClass('warning')).toBe('simulation-summary-card--warning');
+    expect(getSummaryToneClass('cost')).toBe('simulation-summary-card--cost');
+    expect(getSummaryToneClass('emission')).toBe('simulation-summary-card--emission');
+  });
 
-    expect(option.title).toMatchObject({ text: '可再生能源占比' });
-    expect(option.series[0]).toMatchObject({
-      type: 'pie',
-      data: [
-        { value: 70, name: '可再生能源' },
-        { value: 30, name: '不可再生能源' },
+  it('explains the annual total cost calculation', () => {
+    expect(getSummaryHelp('TotalCost')).toEqual({
+      title: '年度总成本计算方法',
+      lines: [
+        '年度总成本 = 年化投资成本 + 公共电网交互费用 + 年度运行维护费用 + 可控机组启停及运行成本',
+        '年化投资成本由各设备建设成本、设备数量、折现率和使用年限折算得到。',
       ],
     });
+    expect(getSummaryHelp('CarbonEmission')).toBeUndefined();
   });
 
   it('builds stacked chart option from backend chart DTO', () => {
@@ -31,7 +29,7 @@ describe('simulation chart options', () => {
       '电',
     );
 
-    expect(option.title).toMatchObject({ text: '生产运行模拟示意图(电)' });
+    expect(option.title).toMatchObject({ text: '电侧功率平衡' });
     expect(option.xAxis).toEqual([{ data: ['00:00'] }]);
     expect(option.series).toEqual([{ name: '风电', type: 'line', data: [1] }]);
   });

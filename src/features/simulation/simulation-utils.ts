@@ -74,9 +74,22 @@ export interface SimulationPieIndicator {
   partTwoValue: number;
 }
 
+export type SimulationIndicatorTone = 'good' | 'warning' | 'cost' | 'emission' | 'neutral';
+
+export interface SimulationSummaryIndicator {
+  indicationName: string;
+  label: string;
+  value: number;
+  formattedValue: string;
+  magnitudeText?: string;
+  unit: string;
+  tone: SimulationIndicatorTone;
+}
+
 export interface NormalizedSimulationResult {
   resultType?: string;
   message?: string;
+  summaryIndicators: SimulationSummaryIndicator[];
   statIndicators: SimulationIndicator[];
   pieIndicators: SimulationPieIndicator[];
   electricStackedChart?: unknown;
@@ -272,6 +285,67 @@ function toNumber(value: unknown) {
   return Number.isFinite(numeric) ? numeric : 0;
 }
 
+function formatNumber(value: number) {
+  return new Intl.NumberFormat('zh-CN', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
+function formatCompactMagnitude(value: number) {
+  return new Intl.NumberFormat('zh-CN', {
+    maximumFractionDigits: 1,
+  }).format(value);
+}
+
+function formatMagnitude(value: number, unit: string) {
+  if (unit === '%') {
+    return undefined;
+  }
+  const unitText = unit === '元' ? unit : ` ${unit}`;
+  const absoluteValue = Math.abs(value);
+  if (absoluteValue >= 1_000_000_000_000) {
+    return `约 ${formatCompactMagnitude(value / 1_000_000_000_000)}万亿${unitText}`;
+  }
+  if (absoluteValue >= 100_000_000) {
+    return `约 ${formatCompactMagnitude(value / 100_000_000)}亿${unitText}`;
+  }
+  if (absoluteValue >= 1_000_000) {
+    return `约 ${Math.round(value / 1_000_000)}百万${unitText}`;
+  }
+  if (absoluteValue >= 10_000) {
+    return `约 ${Math.round(value / 10_000)}万${unitText}`;
+  }
+  return undefined;
+}
+
+const summaryIndicatorMeta: Record<string, Omit<SimulationSummaryIndicator, 'value' | 'formattedValue'>> = {
+  TotalCost: {
+    indicationName: 'TotalCost',
+    label: '年度总成本',
+    unit: '元',
+    tone: 'cost',
+  },
+  CarbonEmission: {
+    indicationName: 'CarbonEmission',
+    label: '碳排放总量',
+    unit: 'kgCO₂',
+    tone: 'emission',
+  },
+  RenewableEnergyShare: {
+    indicationName: 'RenewableEnergyShare',
+    label: '可再生能源占比',
+    unit: '%',
+    tone: 'good',
+  },
+  CurtailmentRate: {
+    indicationName: 'CurtailmentRate',
+    label: '弃风弃光率',
+    unit: '%',
+    tone: 'warning',
+  },
+};
+
 const pieIndicatorMeta: Record<string, Omit<SimulationPieIndicator, 'partOneValue' | 'partTwoValue'>> = {
   RenewableEnergyShare: {
     indicationName: 'RenewableEnergyShare',
@@ -291,6 +365,9 @@ export function normalizeSimulationResult(data: ApiRecord): NormalizedSimulation
   const indicationList = Array.isArray(data.indicationList) ? data.indicationList as SimulationIndicator[] : [];
   const pieIndicators: SimulationPieIndicator[] = [];
   const statIndicators: SimulationIndicator[] = [];
+  const indicatorByName = new Map(
+    indicationList.map(indicator => [String(indicator.indicationName ?? ''), indicator]),
+  );
 
   indicationList.forEach((indicator) => {
     const name = String(indicator.indicationName ?? '');
@@ -307,9 +384,24 @@ export function normalizeSimulationResult(data: ApiRecord): NormalizedSimulation
     statIndicators.push(indicator);
   });
 
+  const summaryIndicators = Object.values(summaryIndicatorMeta).flatMap((meta) => {
+    const indicator = indicatorByName.get(meta.indicationName);
+    if (!indicator) {
+      return [];
+    }
+    const value = toNumber(indicator.indication);
+    return [{
+      ...meta,
+      value,
+      formattedValue: formatNumber(value),
+      magnitudeText: formatMagnitude(value, meta.unit),
+    }];
+  });
+
   return {
     resultType: typeof data.resultType === 'string' ? data.resultType : undefined,
     message: typeof data.message === 'string' ? data.message : undefined,
+    summaryIndicators,
     statIndicators,
     pieIndicators,
     electricStackedChart: data.electricStackedChartDto,

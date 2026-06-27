@@ -18,4 +18,11 @@ describe('SchemePage action placement', () => {
     expect(resetIndex).toBeLessThan(toolbarStart);
     expect(simulateIndex).toBeGreaterThan(toolbarStart);
   });
+
+  it('controls collapse keys and scrolls to simulation results after a run finishes', () => {
+    expect(source).toContain('activeKeys');
+    expect(source).toContain("setActiveKeys(prev => Array.from(new Set([...prev, 'results'])))");
+    expect(source).toContain('resultSectionRef.current?.scrollIntoView');
+    expect(source).toContain('setResult(normalized)');
+  });
 });

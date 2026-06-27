@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { PlayCircleOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useMutation } from '@tanstack/react-query';
 import { App, Button, Card, Collapse, Empty, InputNumber, Space, Tag } from 'antd';
@@ -42,18 +42,27 @@ export function SchemePage() {
   const { message } = App.useApp();
   const [selectionState, setSelectionState] = useState<SimulationSelectionState>(() => createInitialSelectionState());
   const [result, setResult] = useState<NormalizedSimulationResult>();
+  const [activeKeys, setActiveKeys] = useState<string[]>(['loads', 'models', 'environments', 'configuration']);
+  const resultSectionRef = useRef<HTMLDivElement | null>(null);
   const selectedCount = useMemo(() => getSelectedCount(selectionState), [selectionState]);
+
+  const revealResults = () => {
+    setActiveKeys(prev => Array.from(new Set([...prev, 'results'])));
+    window.setTimeout(() => {
+      resultSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
+  };
 
   const simulationMutation = useMutation({
     mutationFn: () => simulate(buildSimulationRequest(selectionState)),
     onSuccess: (response) => {
       const normalized = normalizeSimulationResult(response.data);
+      setResult(normalized);
+      revealResults();
       if (normalized.resultType === 'FAILED') {
-        setResult(undefined);
         message.warning(normalized.message || '仿真失败');
         return;
       }
-      setResult(normalized);
       message.success('仿真完成');
     },
     onError: error => message.error(error instanceof Error ? error.message : '仿真提交失败'),
@@ -135,6 +144,7 @@ export function SchemePage() {
           onClick={() => {
             setSelectionState(createInitialSelectionState());
             setResult(undefined);
+            setActiveKeys(['loads', 'models', 'environments', 'configuration']);
           }}
         >
           重置
@@ -143,7 +153,8 @@ export function SchemePage() {
 
       <Collapse
         className="simulation-flow"
-        defaultActiveKey={['loads', 'models', 'environments', 'configuration']}
+        activeKey={activeKeys}
+        onChange={keys => setActiveKeys(Array.isArray(keys) ? keys : [keys])}
         items={[
           {
             key: 'loads',
@@ -247,7 +258,11 @@ export function SchemePage() {
           {
             key: 'results',
             label: '仿真结果',
-            children: <SimulationResultPanel result={result} />,
+            children: (
+              <div ref={resultSectionRef}>
+                <SimulationResultPanel result={result} />
+              </div>
+            ),
           },
         ]}
       />

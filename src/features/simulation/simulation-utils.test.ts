@@ -152,4 +152,89 @@ describe('simulation result normalizer', () => {
     expect(result.electricStackedChart).toEqual({ series: [{ name: '风电', data: [1] }] });
     expect(result.thermalStackedChart).toEqual({ series: [{ name: '热电', data: [2] }] });
   });
+
+  it('formats summary indicators with consistent labels, units, and display values', () => {
+    const result = normalizeSimulationResult({
+      resultType: 'SUCCESS',
+      indicationList: [
+        { indicationName: 'RenewableEnergyShare', indication: 65 },
+        { indicationName: 'CurtailmentRate', indication: 4.5 },
+        { indicationName: 'CarbonEmission', indication: 123456.789 },
+        { indicationName: 'TotalCost', indication: 987654.321 },
+      ],
+    });
+
+    expect(result.summaryIndicators).toEqual([
+      {
+        indicationName: 'TotalCost',
+        label: '年度总成本',
+        value: 987654.321,
+        formattedValue: '987,654.32',
+        magnitudeText: '约 99万元',
+        unit: '元',
+        tone: 'cost',
+      },
+      {
+        indicationName: 'CarbonEmission',
+        label: '碳排放总量',
+        value: 123456.789,
+        formattedValue: '123,456.79',
+        magnitudeText: '约 12万 kgCO₂',
+        unit: 'kgCO₂',
+        tone: 'emission',
+      },
+      {
+        indicationName: 'RenewableEnergyShare',
+        label: '可再生能源占比',
+        value: 65,
+        formattedValue: '65.00',
+        magnitudeText: undefined,
+        unit: '%',
+        tone: 'good',
+      },
+      {
+        indicationName: 'CurtailmentRate',
+        label: '弃风弃光率',
+        value: 4.5,
+        formattedValue: '4.50',
+        magnitudeText: undefined,
+        unit: '%',
+        tone: 'warning',
+      },
+    ]);
+  });
+
+  it('uses million-level text for larger annual costs', () => {
+    const result = normalizeSimulationResult({
+      resultType: 'SUCCESS',
+      indicationList: [
+        { indicationName: 'TotalCost', indication: 2078643.26 },
+      ],
+    });
+
+    expect(result.summaryIndicators[0].magnitudeText).toBe('约 2百万元');
+  });
+
+  it('uses Chinese large-number units for very large annual costs', () => {
+    expect(normalizeSimulationResult({
+      resultType: 'SUCCESS',
+      indicationList: [{ indicationName: 'TotalCost', indication: 350000000 }],
+    }).summaryIndicators[0].magnitudeText).toBe('约 3.5亿元');
+
+    expect(normalizeSimulationResult({
+      resultType: 'SUCCESS',
+      indicationList: [{ indicationName: 'TotalCost', indication: 1200000000000 }],
+    }).summaryIndicators[0].magnitudeText).toBe('约 1.2万亿元');
+  });
+
+  it('keeps failed simulation messages for the result panel', () => {
+    const result = normalizeSimulationResult({
+      resultType: 'FAILED',
+      message: '缺少风速数据',
+    });
+
+    expect(result.resultType).toBe('FAILED');
+    expect(result.message).toBe('缺少风速数据');
+    expect(result.summaryIndicators).toEqual([]);
+  });
 });

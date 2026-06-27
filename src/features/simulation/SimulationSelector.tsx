@@ -25,11 +25,6 @@ function isModelDefinition(definition: SelectorDefinition): definition is Simula
   return 'requiresQuantity' in definition;
 }
 
-function getRecordDescription(record: ApiRecord) {
-  const id = getRecordId(record);
-  return id === undefined ? '未提供 ID' : `ID: ${String(id)}`;
-}
-
 export function SimulationSelector({ definition, selectedRecords, onChange }: SimulationSelectorProps) {
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState('');
@@ -109,7 +104,6 @@ export function SimulationSelector({ definition, selectedRecords, onChange }: Si
               <Checkbox checked={checked} disabled={id === undefined}>
                 <div className="simulation-selector__record">
                   <strong>{getRecordDisplayName(record)}</strong>
-                  <span>{getRecordDescription(record)}</span>
                 </div>
               </Checkbox>
             </List.Item>

@@ -223,20 +223,93 @@ body {
   gap: 14px;
 }
 
-.simulation-pie-grid {
+.simulation-summary-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
 }
 
-.simulation-chart,
-.simulation-pie-chart {
+.simulation-summary-card {
+  border-left: 4px solid #94a3b8;
+}
+
+.simulation-summary-card--good {
+  border-left-color: #0f766e;
+}
+
+.simulation-summary-card--warning {
+  border-left-color: #d97706;
+}
+
+.simulation-summary-card--cost {
+  border-left-color: #2563eb;
+}
+
+.simulation-summary-card--emission {
+  border-left-color: #7c3aed;
+}
+
+.simulation-summary-card__label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.simulation-summary-card__help {
+  color: #94a3b8;
+  cursor: help;
+}
+
+.simulation-summary-card__help:hover {
+  color: #2563eb;
+}
+
+.simulation-summary-help {
+  max-width: 360px;
+}
+
+.simulation-summary-help p {
+  margin: 0;
+  color: #475569;
+  line-height: 1.7;
+}
+
+.simulation-summary-help p + p {
+  margin-top: 8px;
+}
+
+.simulation-summary-card__value {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.simulation-summary-card__value strong {
+  color: #172033;
+  font-size: 26px;
+  line-height: 1.1;
+}
+
+.simulation-summary-card__value span {
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.simulation-summary-card__magnitude {
+  margin-top: 6px;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.simulation-chart {
   width: 100%;
   min-height: 430px;
-}
-
-.simulation-pie-chart {
-  min-height: 320px;
 }
 
 @media (max-width: 760px) {
