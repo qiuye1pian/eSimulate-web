@@ -9,4 +9,8 @@ describe('MainLayout responsive navigation', () => {
     expect(source).toContain('breakpoint="lg"');
     expect(source).toContain('collapsedWidth={0}');
   });
+
+  it('uses the current platform name in the header', () => {
+    expect(source).toContain('综合能源仿真优化平台');
+  });
 });

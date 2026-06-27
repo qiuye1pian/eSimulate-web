@@ -29,7 +29,7 @@ export function MainLayout() {
       </Sider>
       <Layout>
         <Header className="main-layout__header">
-          <Typography.Text strong>县域多能互补一体化平台</Typography.Text>
+          <Typography.Text strong>综合能源仿真优化平台</Typography.Text>
         </Header>
         <Content className="main-layout__content">
           <Outlet />
